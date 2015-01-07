@@ -18,7 +18,7 @@ directory = getwd()
 subtable = data.frame(NULL)
 
 #Load csv with Alldata into variable
-subtable = read.csv(paste0(directory, "/SubDrop Speakers 2014 data.csv"), header = TRUE)
+subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data.csv"), header = TRUE)
 
 #Drop non-included kids!
 subtable <- subtable[subtable$Include.subject. == "1",]
