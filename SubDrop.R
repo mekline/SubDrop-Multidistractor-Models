@@ -26,6 +26,19 @@ subtable <- subtable[subtable$Include.subject. == "1",]
 #How many kids of each Age, Experiment, Condition?
 with(subtable, tapply(as.numeric(as.character(Include.subject.)), list(Experiment, Condition, Age.Years), sum.na.rm), drop=TRUE)
 
+#Get info for individual sub-experiments (good for updating 'subjects needed' on ongoing exps)
+subtable$Gender <- subtable$Gender..Guessed.from.Name.Appearance.
+PSecret <- subtable[subtable$Experiment == "ParentSecret",]
+KSecret <- subtable[subtable$Experiment == "KidSecret",]
+
+Parent56 <- PSecret[PSecret$Age.Years >4,]
+Parent34 <- PSecret[PSecret$Age.Years < 5,]
+Kid56 <- KSecret[KSecret$Age.Years>4,]
+
+with(Parent34, tapply(as.numeric(as.character(Include.subject.)), list(Condition, Age.Years, Gender), sum.na.rm), drop=TRUE)
+with(Kid56, tapply(as.numeric(as.character(Include.subject.)), list(Condition, Age.Years, Gender), sum.na.rm), drop=TRUE)
+
+
 
 
 #Add new columns to encode 'correctness!'
