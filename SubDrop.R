@@ -29,7 +29,7 @@ with(subtable, tapply(as.numeric(as.character(Include.subject.)), list(Experimen
 #Get info for individual sub-experiments (good for updating 'subjects needed' on ongoing exps)
 subtable$Gender <- subtable$Gender..Guessed.from.Name.Appearance.
 PSecret <- subtable[subtable$Experiment == "ParentSecret",]
-KSecret <- subtable[subtable$Experiment == "KidSecret",]
+KSecret <- subtable[subtable$Experiment == "KidSecret-New",]
 
 Parent56 <- PSecret[PSecret$Age.Years >4,]
 Parent34 <- PSecret[PSecret$Age.Years < 5,]
