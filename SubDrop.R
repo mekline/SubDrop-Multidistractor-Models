@@ -23,6 +23,9 @@ subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data.csv"), header = TRU
 #Drop non-included kids!
 subtable <- subtable[subtable$Include.subject. == "1",]
 
+#Drop early version of KidSecret!
+subtable <- subtable[subtable$Experiment != "KidSecret",]
+
 #How many kids of each Age, Experiment, Condition?
 with(subtable, tapply(as.numeric(as.character(Include.subject.)), list(Experiment, Condition, Age.Years), sum.na.rm), drop=TRUE)
 
