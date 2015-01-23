@@ -70,11 +70,19 @@ subtable$pragChoiceScore <- subtable$isPragChoiceA + subtable$isPragChoiceB
 subtable$choseObjectDrop <- subtable$pragChoiceScore
 subtable[subtable$Condition == "SD",]$choseObjectDrop <- 2-subtable[subtable$Condition == "SD",]$pragChoiceScore
 
+#Just ParentSecret!
+
+subtable <- subtable[subtable$Experiment == "ParentSecret",]
 #Just the big kids
 subtable <- subtable[subtable$Age.Years > 4,]
 
-#OK, do some calcs!
+#OK, do some descriptives!
 
 table(subtable$Condition, subtable$choseObjectDrop)
 table(subtable$Condition, subtable$pragChoiceScore)
+
+#Fisher test
+foo <- c(3,5,3,6,2,1)
+dim(foo) <- c(3,2)
+fisher.test(foo)
 
