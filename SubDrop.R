@@ -18,7 +18,16 @@ directory = getwd()
 subtable = data.frame(NULL)
 
 #Load csv with Alldata into variable
-subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data.csv"), header = TRUE)
+subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data.csv"), header = TRUE, stringsAsFactors = FALSE)
+
+
+#Fix some NA columns
+subtable[is.na(subtable$Strict.include),]$Strict.include <- 0
+subtable$Kid.Response.A...Prag.Choice. <- as.character (subtable$Kid.Response.A...Prag.Choice.)
+subtable$Kid.Response.B...Prag.Choice. <- as.character (subtable$Kid.Response.B...Prag.Choice.)
+
+subtable[is.na(subtable)] <- 0
+#subtable[is.na(subtable$Include.subject),]$Include.subject <- 0
 
 #Drop non-included kids!
 subtable <- subtable[subtable$Include.subject. == "1",]
@@ -30,6 +39,7 @@ subtable <- subtable[subtable$Experiment != "KidSecret",]
 with(subtable, tapply(as.numeric(as.character(Include.subject.)), list(Experiment, Condition, Age.Years), sum.na.rm), drop=TRUE)
 
 #Get info for individual sub-experiments (good for updating 'subjects needed' on ongoing exps)
+subtable$Age.Years <- as.numeric(as.character(subtable$Age.Years))
 subtable$Gender <- subtable$Gender..Guessed.from.Name.Appearance.
 PSecret <- subtable[subtable$Experiment == "ParentSecret",]
 KSecret <- subtable[subtable$Experiment == "KidSecret-New",]
@@ -81,8 +91,23 @@ subtable <- subtable[subtable$Age.Years > 4,]
 table(subtable$Condition, subtable$choseObjectDrop)
 table(subtable$Condition, subtable$pragChoiceScore)
 
-#Fisher test
-foo <- c(3,5,3,6,2,1)
-dim(foo) <- c(3,2)
-fisher.test(foo)
+#Can we do a logistic regression on this one? I don't see why not!
 
+#First make some necessary things factors, and melt the dataset
+
+subtable$Condition <- as.factor(subtable$Condition)
+subtable$Subject <- as.factor(subtable$Subject..)
+subtable$choseObjectDrop <- as.factor(subtable$choseObjectDrop)
+subtable$pragChoice_1 <- subtable$isPragChoiceA
+subtable$pragChoice_2 <- subtable$isPragChoiceB
+
+sub.long = wideToLong(subtable,within="trial", sep='_')
+sub.long$choseObjectDrop <- sub.long$pragChoice
+sub.long[sub.long$Condition == "SD",]$choseObjectDrop <- 1-sub.long[sub.long$Condition == "SD",]$pragChoice
+
+
+full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial), data=sub.long, family="binomial")
+summary(full_maximal_model)
+
+no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial), data=sub.long, family="binomial")
+anova(full_maximal_model, no_fixed)
