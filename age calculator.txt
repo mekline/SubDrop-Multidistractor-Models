@@ -3,6 +3,10 @@ Age calculator
 http://www.calculator.net/age-calculator.html
 
 
+<<<<<<< HEAD
 
 
 Taylor copy change
+=======
+Fake change
+>>>>>>> origin/master
