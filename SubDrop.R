@@ -59,7 +59,10 @@ subtable <- subtable[subtable$Experiment != "KidSecret",]
 
 #Choose ParentSecret on older children
 subtable <- subtable[subtable$Experiment == "ParentSecret",]
-subtable <- subtable[subtable$Age.Years > 4,]
+#subtable <- subtable[subtable$Age.Years > 4,]
+
+#Optional - choose stricter inclusion criteria..
+subtable <- subtable[subtable$Strict.include == 1,]
 
 
 #############################################
@@ -74,11 +77,31 @@ subtable[subtable$Condition == "SD" & subtable$Kid.Response.A...Prag.Choice. == 
 subtable[subtable$Condition == "OD" & subtable$Kid.Response.A...Prag.Choice. == "monkey eat",]$isPragChoiceA <- 1
 subtable[subtable$Condition == "OD" & subtable$Kid.Response.A...Prag.Choice. == "eat orange",]$isPragChoiceA <- 0
 
+subtable[subtable$Condition == "SDOD" & subtable$Kid.Response.A...Prag.Choice. == "monkey eat",]$isPragChoiceA <- 0
+subtable[subtable$Condition == "SDOD" & subtable$Kid.Response.A...Prag.Choice. == "eat orange",]$isPragChoiceA <- 1
+subtable[subtable$Condition == "ODSD" & subtable$Kid.Response.A...Prag.Choice. == "monkey eat",]$isPragChoiceA <- 1
+subtable[subtable$Condition == "ODSD" & subtable$Kid.Response.A...Prag.Choice. == "eat orange",]$isPragChoiceA <- 0
+
+subtable[subtable$Condition == "SDSD" & subtable$Kid.Response.A...Prag.Choice. == "monkey eat",]$isPragChoiceA <- 0
+subtable[subtable$Condition == "SDSD" & subtable$Kid.Response.A...Prag.Choice. == "eat orange",]$isPragChoiceA <- 1
+subtable[subtable$Condition == "ODOD" & subtable$Kid.Response.A...Prag.Choice. == "monkey eat",]$isPragChoiceA <- 1
+subtable[subtable$Condition == "ODOD" & subtable$Kid.Response.A...Prag.Choice. == "eat orange",]$isPragChoiceA <- 0
+
 subtable$isPragChoiceB <- "NA"
 subtable[subtable$Condition == "SD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 0
 subtable[subtable$Condition == "SD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 1
 subtable[subtable$Condition == "OD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 1
 subtable[subtable$Condition == "OD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 0
+
+subtable[subtable$Condition == "SDOD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 0
+subtable[subtable$Condition == "SDOD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 1
+subtable[subtable$Condition == "ODSD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 1
+subtable[subtable$Condition == "ODSD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 0
+
+subtable[subtable$Condition == "SDSD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 0
+subtable[subtable$Condition == "SDSD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 1
+subtable[subtable$Condition == "ODOD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 1
+subtable[subtable$Condition == "ODOD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 0
 
 subtable$isPragChoiceA <- as.numeric(as.character(subtable$isPragChoiceA))
 subtable$isPragChoiceB <- as.numeric(as.character(subtable$isPragChoiceB))
@@ -87,10 +110,17 @@ subtable$pragChoiceScore <- subtable$isPragChoiceA + subtable$isPragChoiceB
 
 subtable$choseObjectDrop <- subtable$pragChoiceScore
 subtable[subtable$Condition == "SD",]$choseObjectDrop <- 2-subtable[subtable$Condition == "SD",]$pragChoiceScore
+subtable[subtable$Condition == "SDOD",]$choseObjectDrop <- 2-subtable[subtable$Condition == "SDOD",]$pragChoiceScore
+subtable[subtable$Condition == "SDSD",]$choseObjectDrop <- 2-subtable[subtable$Condition == "SDSD",]$pragChoiceScore
 
 
 ####################################
 #Descriptive stats for graph
+
+subtable[subtable$Condition == "SDOD",]$Condition <- "SD"
+subtable[subtable$Condition == "SDSD",]$Condition <- "SD"
+subtable[subtable$Condition == "ODSD",]$Condition <- "OD"
+subtable[subtable$Condition == "ODOD",]$Condition <- "OD"
 
 table(subtable$Condition, subtable$choseObjectDrop)
 table(subtable$Condition, subtable$pragChoiceScore)
