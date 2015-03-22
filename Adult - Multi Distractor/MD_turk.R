@@ -9,6 +9,8 @@
 library(languageR)
 library(lme4)
 library(stringr)
+library(binom)
+library(bootstrap)
 source("tedlab-misc.R")
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
 
@@ -180,7 +182,12 @@ mydata$mentionObject <- FALSE
 mydata[mydata$word1_CODED == 'OBJECT',]$mentionObject <- TRUE
 mydata[mydata$word2_CODED == 'OBJECT',]$mentionObject <- TRUE
 
-#Code whether the SV or VO solution was reached
+mydata$mentionOther <- FALSE
+mydata[mydata$word1_CODED == 'OTHER',]$mentionOther <- TRUE
+mydata[mydata$word2_CODED == 'OTHER',]$mentionOther <- TRUE
+
+
+#Code whether the exact SV or VO solution was reached
 mydata$mentionSV <- FALSE
 mydata[mydata$mentionSubject == TRUE & mydata$mentionVerb == TRUE,]$mentionSV <- TRUE
 
@@ -194,6 +201,9 @@ mydata[mydata$mentionObject == TRUE & mydata$mentionVerb == TRUE,]$mentionVO <- 
 #Descriptives
 #######
 
+#How often did people go off piste with response?
+mean(mydata$mentionOther)
+
 
 #Look at overall results
 with(mydata, tapply(mentionSubject, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
@@ -201,8 +211,53 @@ with(mydata, tapply(mentionObject, list(trialVersion), mean, na.rm=TRUE), drop=T
 with(mydata, tapply(mentionVerb, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 
 #Get some bootstrapped confidence intervals for these numbers
+#TERRIBLE CODE ALERT there is definitely some better way to do this. 
+mentionSb_1.boot.mean = bootstrap(mydata[mydata$trialVersion=="1_6",]$mentionSubject, 1000, mean)
+quantile(mentionSb_1.boot.mean$thetastar, c(0.025, 0.975))
+mentionSb_2.boot.mean = bootstrap(mydata[mydata$trialVersion=="2_5",]$mentionSubject, 1000, mean)
+quantile(mentionSb_2.boot.mean$thetastar, c(0.025, 0.975))
+mentionSb_3.boot.mean = bootstrap(mydata[mydata$trialVersion=="3_4",]$mentionSubject, 1000, mean)
+quantile(mentionSb_3.boot.mean$thetastar, c(0.025, 0.975))
+mentionSb_4.boot.mean = bootstrap(mydata[mydata$trialVersion=="4_3",]$mentionSubject, 1000, mean)
+quantile(mentionSb_4.boot.mean$thetastar, c(0.025, 0.975))
+mentionSb_5.boot.mean = bootstrap(mydata[mydata$trialVersion=="5_2",]$mentionSubject, 1000, mean)
+quantile(mentionSb_5.boot.mean$thetastar, c(0.025, 0.975))
+mentionSb_6.boot.mean = bootstrap(mydata[mydata$trialVersion=="6_1",]$mentionSubject, 1000, mean)
+quantile(mentionSb_6.boot.mean$thetastar, c(0.025, 0.975))
+
+mentionOb_1.boot.mean = bootstrap(mydata[mydata$trialVersion=="1_6",]$mentionObject, 1000, mean)
+quantile(mentionOb_1.boot.mean$thetastar, c(0.025, 0.975))
+mentionOb_2.boot.mean = bootstrap(mydata[mydata$trialVersion=="2_5",]$mentionObject, 1000, mean)
+quantile(mentionOb_2.boot.mean$thetastar, c(0.025, 0.975))
+mentionOb_3.boot.mean = bootstrap(mydata[mydata$trialVersion=="3_4",]$mentionObject, 1000, mean)
+quantile(mentionOb_3.boot.mean$thetastar, c(0.025, 0.975))
+mentionOb_4.boot.mean = bootstrap(mydata[mydata$trialVersion=="4_3",]$mentionObject, 1000, mean)
+quantile(mentionOb_4.boot.mean$thetastar, c(0.025, 0.975))
+mentionOb_5.boot.mean = bootstrap(mydata[mydata$trialVersion=="5_2",]$mentionObject, 1000, mean)
+quantile(mentionOb_5.boot.mean$thetastar, c(0.025, 0.975))
+mentionOb_6.boot.mean = bootstrap(mydata[mydata$trialVersion=="6_1",]$mentionObject, 1000, mean)
+quantile(mentionOb_6.boot.mean$thetastar, c(0.025, 0.975))
+
+mentionVb_1.boot.mean = bootstrap(mydata[mydata$trialVersion=="1_6",]$mentionVerb, 1000, mean)
+quantile(mentionVb_1.boot.mean$thetastar, c(0.025, 0.975))
+mentionVb_2.boot.mean = bootstrap(mydata[mydata$trialVersion=="2_5",]$mentionVerb, 1000, mean)
+quantile(mentionVb_2.boot.mean$thetastar, c(0.025, 0.975))
+mentionVb_3.boot.mean = bootstrap(mydata[mydata$trialVersion=="3_4",]$mentionVerb, 1000, mean)
+quantile(mentionVb_3.boot.mean$thetastar, c(0.025, 0.975))
+mentionVb_4.boot.mean = bootstrap(mydata[mydata$trialVersion=="4_3",]$mentionVerb, 1000, mean)
+quantile(mentionVb_4.boot.mean$thetastar, c(0.025, 0.975))
+mentionVb_5.boot.mean = bootstrap(mydata[mydata$trialVersion=="5_2",]$mentionVerb, 1000, mean)
+quantile(mentionVb_5.boot.mean$thetastar, c(0.025, 0.975))
+mentionVb_6.boot.mean = bootstrap(mydata[mydata$trialVersion=="6_1",]$mentionVerb, 1000, mean)
+quantile(mentionVb_6.boot.mean$thetastar, c(0.025, 0.975))
+
+
+
+
+
+
 ########
-#Lump by subject to get frequency scores!
+#Lump by subject to get frequency scores! Just for fun There are 2 trials per version (1_6, etc)
 
 mentionSubject <- aggregate(mydata$mentionSubject, by = list(mydata$Paycode, mydata$trialVersion), sum)
 names(mentionSubject) <- c("Paycode", "trialVersion", "mentionSubject")
@@ -221,13 +276,7 @@ with(mentionSubject, tapply(mentionSubject, list(trialVersion), mean, na.rm=TRUE
 with(mentionObject, tapply(mentionObject, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 with(mentionVerb, tapply(mentionVerb, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 
-sum.na.rm <- function(x) { sum(x,na.rm=T) }
-my.sd <- function(x) {sd(x)/sqrt(length(x))}
-
-with(mentionSubject, tapply(mentionSubject, list(trialVersion), my.sd), drop=TRUE)
-with(mentionObject, tapply(mentionObject, list(trialVersion), my.sd), drop=TRUE)
-with(mentionVerb, tapply(mentionVerb, list(trialVersion), my.sd), drop=TRUE)
-
+#(Check with exact SV VO solutions too)
 with(mentionSV, tapply(mentionSV, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 with(mentionVO, tapply(mentionVO, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 
@@ -242,7 +291,7 @@ with(mentionVO, tapply(mentionVO, list(trialVersion), my.sd), drop=TRUE)
 #Run models!!
 #######
 
-#Make a variable for the inputs - number of subjects (There may be a better ordinal solution that I am not using?)
+#Make a variable for the inputs - number of subjects
 mydata$nSubj <- as.numeric(mydata$trialVersion) #This works because trialVersion is coded as 6_1 (6 sub 1 ob), 5_2 (5sub 2 ob) etc.
 
 #Make sure that item and subject codings are factors...
@@ -250,17 +299,17 @@ mydata$paycode <- as.factor(mydata$paycode)
 mydata$verb <- as.factor(mydata$verb)
 
 #Here's a good important test!  Try taking out the extreme levels of nSubj to see if everything holds on messy cases!!!!
-mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
+#mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
 
 #######
 #We can test a few different outcome measures, e.g., whether Subject was mentioned
 
 #The nsubj manipulation is within-subject AND within-item, so the full random slopes model is:
-full_maximal_model <- lmer(mentionSubject ~ nSubj + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
-summary(full_maximal_model)
+full_maximal_model <- lmer(mentionSubject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+#summary(full_maximal_model)
 
 #Comparison model with just random slopes:
-random_slope_model <- lmer(mentionSubject ~1 + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
+random_slope_model <- lmer(mentionSubject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 
 #Likelihood ratio test:
 anova(full_maximal_model, random_slope_model)
@@ -268,9 +317,9 @@ anova(full_maximal_model, random_slope_model)
 #######
 #Or ask whether object was mentioned
 
-full_maximal_model <- lmer(mentionObject ~ nSubj + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
-summary(full_maximal_model)
-random_slope_model <- lmer(mentionObject ~1 + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
+full_maximal_model <- lmer(mentionObject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+#summary(full_maximal_model)
+random_slope_model <- lmer(mentionObject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 anova(full_maximal_model, random_slope_model)
 
 
@@ -278,16 +327,25 @@ anova(full_maximal_model, random_slope_model)
 ##################################
 #Also look at Subject drop main effect! (People drop subjects more often than objects)
 
-#Just do something really simple - for each subject, give them a subject and object score, and pair-t-test them!
+#Overall, did people tend to mention subjects, or objects?
+mean(mydata$mentionSubject)
+mean(mydata$mentionObject)
 
-SubjectScore <- aggregate(mydata$mentionSubject, by = list(mydata$Paycode), sum)
-names(SubjectScore) <- c("Paycode", "SubjectScore")
-ObjectScore <- aggregate(mydata$mentionObject, by = list(mydata$Paycode), sum)
-names(ObjectScore) <- c("Paycode", "ObjectScore")
+#Test the distribution of answers that mentioned JUST ONE of those two
+mydata$Only <- "Neither"
+mydata[(mydata$word1_CODED == "AGENT" | mydata$word2_CODED == "AGENT") & !(mydata$word1_CODED == "OBJECT" | mydata$word2_CODED == "OBJECT"),]$Only <- "SubOnly"
+mydata[!(mydata$word1_CODED == "AGENT" | mydata$word2_CODED == "AGENT") & (mydata$word1_CODED == "OBJECT" | mydata$word2_CODED == "OBJECT"),]$Only <- "SubOnly"
 
-ArgScores <- merge(SubjectScore, ObjectScore, by=c("Paycode"))
+#How many had both?
+mean(mydata$Only == "Neither")
 
-t.test(ArgScores$SubjectScore, ArgScores$ObjectScore, paired=TRUE)
+diffdata <- mydata[mydata$Only != "Neither",]
+diffdata$wasOb <- diffdata$Only == "ObOnly"
+
+#Test!
+binom.test(sum(diffdata$wasOb), nrow(diffdata))
+
+
 
 
 
@@ -296,21 +354,26 @@ t.test(ArgScores$SubjectScore, ArgScores$ObjectScore, paired=TRUE)
 #######
 #Double checking: ask whether SV solution was used
 
-full_maximal_model <- lmer(mentionSV ~ nSubj + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
-random_slope_model <- lmer(mentionSV ~1 + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
+full_maximal_model <- lmer(mentionSV ~ nSubj + (nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
+random_slope_model <- lmer(mentionSV ~1 + (nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
 anova(full_maximal_model, random_slope_model)
 
 #######
 #Or whether VO solution was used 
 
-full_maximal_model <- lmer(mentionVO ~ nSubj + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
-random_slope_model <- lmer(mentionVO ~1 + (1+ nSubj|paycode) +(1+ nSubj|verb), data=mydata, family="binomial")
+full_maximal_model <- lmer(mentionVO ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+random_slope_model <- lmer(mentionVO ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 anova(full_maximal_model, random_slope_model)
 
 
 
+
+
+
+
+##### Extra analyses
 ##################################3
-#Also look at verb surprisals!!
+#We looked at verb surprisals, but they weren't very informative. (We jsut asked people how surprising the verb was given the agent & patient sets, e.g. THROW fruit vs. EAT fruit)
 
 #First look at the data - for each verb, how often included? what average surprisal?
 
