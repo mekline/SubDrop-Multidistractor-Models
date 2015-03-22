@@ -1,0 +1,13 @@
+Item,Verb,Sentence,D1,D2,sub,obj,D3,Objects,Prefix
+1,DRINK,George drinks the juice.,ALEXA,SPOON,GEORGE,JUICE,FEED,coffee.coke.juice.milk.milkshake.water,b
+2,EAT,Alexa eats the orange.,JOHN,TIRE,ALEXA,ORANGE,READ,apple.banana.grapes.orange.strawberry.watermelon,f
+3,FEED,John feeds the dog.,SAM,ORANGE,JOHN,DOG,ROLL,cat.dog.duck.pig.rabbit.sheep2,a
+4,READ,Sam reads the book.,ZACK,DOG,SAM,BOOK,WASH,book.comics.magazine.manual.map.newspaper,m
+5,ROLL,Zack rolls the ball.,JENN,BOOK,ZACK,BALL,POUR,ball.log.rollingpin.tape.tire.can,r
+6,WASH,Jenn washes the bowl.,RON,BALL,JENN,BOWL,THROW,bowl.knife.plate.saucepan.spatula.spoon,k
+7,POUR,Ron pours the milk.,SUE,BOWL,RON,MILK,TOUCH,coffee.coke.juice.milk.milkshake.water,b
+8,THROW,Sue throws the bananas.,MIKE,MILK,SUE,BANANAS,DROP,apple.banana.grapes.orange.strawberry.watermelon,f
+9,TOUCH,Mike touches the kitten.,MARIA,BANANAS,MIKE,KITTEN,KICK,cat.dog.duck.pig.rabbit.sheep2,a
+10,DROP,Maria drops the newspaper.,EMILY,KITTEN,MARIA,NEWSPAPER,HOLD,book.comics.magazine.manual.map.newspaper,m
+11,KICK,Emily kicks the tire.,AMY,NEWSPAPER,EMILY,TIRE,DRINK,ball.log.rollingpin.tape.tire.can,r
+12,HOLD,Amy holds the spoon.,GEORGE,JUICE,AMY,SPOON,EAT,bowl.knife.plate.saucepan.spatula.spoon,k
