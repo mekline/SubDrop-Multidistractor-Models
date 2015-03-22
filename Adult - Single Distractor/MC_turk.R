@@ -4,6 +4,7 @@
 ## July, August, September 2010 Ted Gibson
 ###############################################################
 
+#setwd(mydirectory)
 
 library(languageR)
 library(stringr)
@@ -12,6 +13,9 @@ source("tedlab-misc.R")
 library(binom)
 library(bootstrap)
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
+sum.na.rm <- function(x) { sum(x,na.rm=T) }
+my.sd <- function(x) {sd(x)/sqrt(length(x))}
+
 
 turk.files <- list.files('batch')
 willow.files <- list.files('log')
@@ -83,13 +87,13 @@ mydata[is.na(mydata$HasWillow),]$WorkerId
 ## And save WorkerID code lists for the future...
 
 #################################################################
-## Check through the data for compliance and multiple takers (the general full-set solution!! 
-## Use this for actually running the analysis!
+## Check through the data for compliance
 
 #If your line doesn't have Turk, we'll give you a free pass on language, country, and video presentation
 mydata[is.na(mydata$HasTurk),]$Answer.English <- "yes"
 mydata[is.na(mydata$HasTurk),]$Answer.country <- "USA"
 
+#Uncomment to check for repeat takers in the set (the general full-set solution!!) , there are none this time
 ##Come up with a true subject labeling order
 #mydata$willowSubNo <- as.numeric(as.character(mydata$willowSubNo))
 #trueSub <- unique(mydata[,c('willowcode','willowSubNo', 'Paycode')])
@@ -128,24 +132,6 @@ names(participant.responsecount) <- c("Paycode", "gotError")
 participant.responsecount$LegalAnswers <- 6-participant.responsecount$gotError
 mydata <- merge(mydata, participant.responsecount, by=c("Paycode"), all.x=TRUE)
 
-###############################################
-## Throw out people who took a Snazzy Potato task before!
-
-#previousers <- read.csv('snazzy potato 8-19-2012.txt', header=F)
-#names(previousers) <- c("WorkerId")
-#thistime <- unique(mydata$WorkerId)
-#previous <- intersect(previousers$WorkerId,thistime)
-#
-##Grr!  Go make sure to not pay those guys!....
-#
-#Save lists for next time (copy results into workerId txt files)
-#unique(mydata$WorkerId)
-#
-#mydata$tookPreviously <- mydata$WorkerId %in% previous
-#
-#mydata <- mydata[mydata$tookPreviously == FALSE,]
-
-
 #################################################################
 ## Drop for analysis
 #(Remember, Willow-onliers got a free pass on the first 3 here...)
@@ -175,7 +161,8 @@ length(unique(mydata$Paycode)) #38
 stimuli <- read.csv('stimuli_targets.csv', header=T)
 mydata <- merge(mydata, stimuli, by=c('stimNo', 'verb', 'sentence'))
 
-# Get answers ready for comparison (they were cleaned up by hand too!)
+# Get answers ready for comparison (NOTE: they were cleaned up by hand too, by replacing e.g. EATING with EAT)
+#But other word stems left alone (e.g. HUNGRY != EAT)
 mydata$word1.clean <- toupper(mydata$word1.clean)
 mydata$word2.clean <- toupper(mydata$word2.clean)
 
@@ -232,43 +219,55 @@ with(mentionSubject, tapply(mentionSubject, list(trialVersion), mean, na.rm=TRUE
 with(mentionObject, tapply(mentionObject, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 with(mentionVerb, tapply(mentionVerb, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 
-sum.na.rm <- function(x) { sum(x,na.rm=T) }
-my.sd <- function(x) {sd(x)/sqrt(length(x))}
-
-with(mentionSubject, tapply(mentionSubject, list(trialVersion), my.sd), drop=TRUE)
-with(mentionObject, tapply(mentionObject, list(trialVersion), my.sd), drop=TRUE)
-with(mentionVerb, tapply(mentionVerb, list(trialVersion), my.sd), drop=TRUE)
-
 ###STATISTICS
 
-#MentionSubject? 
+#####
+#MentionSubject?
 #Note, trial version is within subject AND within item (eg WASH), so make the random slopes model accordingly
 
+#Try the maximal random effects model
 #subj_model <- lmer(mentionSubject ~ trialVersion + (trialVersion|Paycode) + (trialVersion|verb), data=mydata, family="binomial")
 #Failed to converge! start removing slopes.
 subj_model2 <- lmer(mentionSubject ~ trialVersion + (1|Paycode) + (trialVersion|verb), data=mydata, family="binomial")
-summary(subj_model2)
+subj_model_nofix <- lmer(mentionSubject ~ 1 + (1|Paycode) + (trialVersion|verb), data=mydata, family="binomial")
+anova(subj_model2, subj_model_nofix)
 
 #MentionObject?
 #(Same model structure)
 #obj_model <- lmer(mentionObject ~ trialVersion + (trialVersion|Paycode) + (trialVersion|verb), data=mydata, family="binomial")
 #noconverge
 obj_model2 <- lmer(mentionObject ~ trialVersion + (1|Paycode) + (trialVersion|verb), data=mydata, family="binomial")
-summary(obj_model2)
+obj_nofix <- lmer(mentionObject ~ 1 + (1|Paycode) + (trialVersion|verb), data=mydata, family="binomial")
+anova(obj_model2, obj_nofix)
 
 
 #Overall, did people tend to mention subjects, or objects?
-mydata$ObOnly <- "Neither"
-mydata[(mydata$word1.clean == mydata$Subject | mydata$word2.clean == mydata$Subject) & !(mydata$word1.clean == mydata$Object | mydata$word2.clean == mydata$Object),]$ObOnly <- "SubOnly"
-mydata[!(mydata$word1.clean == mydata$Subject | mydata$word2.clean == mydata$Subject) & (mydata$word1.clean == mydata$Object | mydata$word2.clean == mydata$Object),]$ObOnly <- "ObOnly"
-diffdata <- mydata[mydata$ObOnly != "Neither",]
-diffdata$wasOb <- diffdata$ObOnly == "ObOnly"
+mean(mydata$mentionSubject)
+mean(mydata$mentionObject)
+
+#Test the distribution of answers that mentioned JUST ONE of those two
+mydata$Only <- "Neither"
+mydata[(mydata$word1.clean == mydata$Subject | mydata$word2.clean == mydata$Subject) & !(mydata$word1.clean == mydata$Object | mydata$word2.clean == mydata$Object),]$Only <- "SubOnly"
+mydata[!(mydata$word1.clean == mydata$Subject | mydata$word2.clean == mydata$Subject) & (mydata$word1.clean == mydata$Object | mydata$word2.clean == mydata$Object),]$Only <- "ObOnly"
+
+#How many had both?
+mean(mydata$Only == "Neither")
+
+diffdata <- mydata[mydata$Only != "Neither",]
+diffdata$wasOb <- diffdata$Only == "ObOnly"
 
 #Test!
 binom.test(sum(diffdata$wasOb), nrow(diffdata))
 
+
+
 #####
-#Check exact SV/VO responses (we expect these to be the same as for the whole dataset!!) We'll code this as a binary variable after tossing ones that conform to some other pattern.
+#####
+#####
+#####
+#####
+#Check exact SV/VO responses (we expect these to be the same as for the whole dataset!!) We'll code this as a binary variable after tossing ones that match to some other pattern.
+# (These analyses all come out as we expect)
 
 mydata$ExactResp <- "Other"
 mydata[mydata$word1.clean == mydata$Subject & mydata$word2.clean == mydata$Verb,]$ExactResp <- "SV"
@@ -281,4 +280,9 @@ onlydata <- mydata[mydata$ExactResp == "SV" | mydata$ExactResp == "VO", ]
 #only_model <- lmer(mentionSubject ~ trialVersion + (trialVersion|Paycode) + (trialVersion|verb), data=onlydata, family="binomial")
 #Failed to converge! start removing slopes.
 only_model2 <- lmer(mentionSubject ~ trialVersion + (1|Paycode) + (trialVersion|verb), data=onlydata, family="binomial")
-summary(only_model)
+only_nofix <- lmer(mentionSubject ~ 1 + (1|Paycode) + (trialVersion|verb), data=onlydata, family="binomial")
+anova(only_model2, only_nofix)
+
+only_model2 <- lmer(mentionObject ~ trialVersion + (1|Paycode) + (trialVersion|verb), data=onlydata, family="binomial")
+only_nofix <- lmer(mentionObject ~ 1 + (1|Paycode) + (trialVersion|verb), data=onlydata, family="binomial")
+anova(only_model2, only_nofix)
