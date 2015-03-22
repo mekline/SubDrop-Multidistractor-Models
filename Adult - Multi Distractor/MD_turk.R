@@ -299,7 +299,7 @@ mydata$paycode <- as.factor(mydata$paycode)
 mydata$verb <- as.factor(mydata$verb)
 
 #Here's a good important test!  Try taking out the extreme levels of nSubj to see if everything holds on messy cases!!!!
-#mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
+mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
 
 #######
 #We can test a few different outcome measures, e.g., whether Subject was mentioned
