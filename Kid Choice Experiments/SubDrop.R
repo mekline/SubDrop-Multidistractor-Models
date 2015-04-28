@@ -22,7 +22,7 @@ directory = getwd()
 subtable = data.frame(NULL)
 
 #Load csv with Alldata into variable
-subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data_32115_thesis.csv"), header = TRUE, stringsAsFactors = FALSE)
+subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data_42815_thesis.csv"), header = TRUE, stringsAsFactors = FALSE)
 
 
 #Fix some NA columns
@@ -33,11 +33,15 @@ subtable$Kid.Response.B...Prag.Choice. <- as.character (subtable$Kid.Response.B.
 subtable[is.na(subtable)] <- 0
 #subtable[is.na(subtable$Include.subject),]$Include.subject <- 0
 
+#Fix age calculations!
+subtable$Age.Years <- as.numeric(as.character(subtable$Age.Years))
+subtable$Days.Old <- as.numeric(as.character(subtable$Days.Old))
+
 ####################################
 #Pick subset of data to analyze
 
 #Drop non-included kids!
-subtable <- subtable[subtable$Include.subject. == "1",]
+#subtable <- subtable[subtable$Include.subject. == "1",]
 #New - choose stricter inclusion criteria.., following new paradigm rules
 subtable <- subtable[subtable$Strict.include == 1,]
 
@@ -103,6 +107,13 @@ subtable[subtable$Condition == "SD",]$choseObjectDrop <- 2-subtable[subtable$Con
 table(subtable$Condition, subtable$choseObjectDrop)
 table(subtable$Condition, subtable$pragChoiceScore)
 
+#and split by age
+subtable34 <- subtable[subtable$Age.Years < 5,]
+subtable56 <- subtable[subtable$Age.Years > 4,]
+
+table(subtable34$Condition, subtable34$choseObjectDrop)
+table(subtable56$Condition, subtable56$choseObjectDrop)
+
 
 ####################################
 # Analysis
@@ -119,12 +130,36 @@ sub.long = wideToLong(subtable,within="trial", sep='_')
 sub.long$choseObjectDrop <- sub.long$pragChoice
 sub.long[sub.long$Condition == "SD",]$choseObjectDrop <- 1-sub.long[sub.long$Condition == "SD",]$pragChoice
 
+sub.long56 <- sub.long[sub.long$Age.Years>4,]
+sub.long34 <- sub.long[sub.long$Age.Years<5,]
+
 # Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
-#full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
-#Doesn't converge! Remove random effects
-full_maximal_model <- lmer(choseObjectDrop ~ Condition + (1|trial) + (1|Subject), data=sub.long, family="binomial")
+full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
 
 #compare to model w/o fixed effect
-no_fixed <- lmer(choseObjectDrop ~ 1 + (1|trial) + (1|Subject), data=sub.long, family="binomial")
+no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
 anova(full_maximal_model, no_fixed)
+
+#Within age groups
+#5 and 6
+full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=sub.long56, family="binomial")
+#compare to model w/o fixed effect
+no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=sub.long56, family="binomial")
+anova(full_maximal_model, no_fixed)
+
+#3 and 4
+full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=sub.long34, family="binomial")
+#compare to model w/o fixed effect
+no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=sub.long34, family="binomial")
+anova(full_maximal_model, no_fixed)
+
+######
+#Now try age as a factor??
+
+# Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
+full_maximal_model <- lmer(choseObjectDrop ~ Condition*Age.Years + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
+no_age <- lmer(choseObjectDrop ~ Condition+Age.Years + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
+anova(full_maximal_model, no_age)
+
+
 
