@@ -45,9 +45,9 @@ subtable$Days.Old <- as.numeric(as.character(subtable$Days.Old))
 #New - choose stricter inclusion criteria.., following new paradigm rules
 subtable <- subtable[subtable$Strict.include == 1,]
 
-#Choose ParentSecret on older children
+#Choose ParentSecret study version
 subtable <- subtable[subtable$Experiment == "ParentSecret",]
-subtable <- subtable[subtable$Age.Years > 4,]
+#subtable <- subtable[subtable$Age.Years > 4,]
 
 
 
@@ -109,6 +109,7 @@ table(subtable$Condition, subtable$pragChoiceScore)
 
 #and split by age
 subtable34 <- subtable[subtable$Age.Years < 5,]
+subtable34 <- subtable34[subtable34$Age.Years > 3,]
 subtable56 <- subtable[subtable$Age.Years > 4,]
 
 table(subtable34$Condition, subtable34$choseObjectDrop)
@@ -132,6 +133,7 @@ sub.long[sub.long$Condition == "SD",]$choseObjectDrop <- 1-sub.long[sub.long$Con
 
 sub.long56 <- sub.long[sub.long$Age.Years>4,]
 sub.long34 <- sub.long[sub.long$Age.Years<5,]
+sub.long4 <- sub.long34[sub.long34$Age.Years>3,]
 
 # Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
 full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
