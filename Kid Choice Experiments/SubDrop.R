@@ -92,8 +92,13 @@ subtable[subtable$Condition == "SD" & subtable$Kid.Response.B...Prag.Choice. == 
 subtable[subtable$Condition == "OD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 1
 subtable[subtable$Condition == "OD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 0
 
+
+#One kid didn't answer on trial 1 and will need to be dropped
+subtable <- subtable[subtable$isPragChoiceA != "NA",]
 subtable$isPragChoiceA <- as.numeric(as.character(subtable$isPragChoiceA))
 subtable$isPragChoiceB <- as.numeric(as.character(subtable$isPragChoiceB))
+
+
 
 #Express this as # chose 'correct'
 subtable$pragChoiceScore <- subtable$isPragChoiceA + subtable$isPragChoiceB
@@ -108,14 +113,6 @@ subtable[subtable$Condition == "SD",]$choseObjectDrop <- 2-subtable[subtable$Con
 
 table(subtable$Condition, subtable$choseObjectDrop)
 table(subtable$Condition, subtable$pragChoiceScore)
-
-#and split by age
-subtable34 <- subtable[subtable$Age.Years < 5,]
-subtable34 <- subtable34[subtable34$Age.Years > 3,]
-subtable56 <- subtable[subtable$Age.Years > 4,]
-
-table(subtable34$Condition, subtable34$choseObjectDrop)
-table(subtable56$Condition, subtable56$choseObjectDrop)
 
 
 ####################################
@@ -133,16 +130,48 @@ sub.long = wideToLong(subtable,within="trial", sep='_')
 sub.long$choseObjectDrop <- sub.long$pragChoice
 sub.long[sub.long$Condition == "SD",]$choseObjectDrop <- 1-sub.long[sub.long$Condition == "SD",]$pragChoice
 
-sub.long56 <- sub.long[sub.long$Age.Years>4,]
-sub.long34 <- sub.long[sub.long$Age.Years<5,]
-sub.long4 <- sub.long34[sub.long34$Age.Years>3,]
-
 # Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
 full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
 
 #compare to model w/o fixed effect
 no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
 anova(full_maximal_model, no_fixed)
+
+
+
+
+
+######AGE EFFECTS
+
+#graphs split by age
+subtable3 <- subtable[subtable$Age.Years < 4,]
+subtable4 <- subtable[subtable$Age.Years > 3 & subtable$Age.Years < 5,]
+subtable5 <- subtable[subtable$Age.Years > 4 & subtable$Age.Years < 6,]
+subtable6 <- subtable[subtable$Age.Years > 5,]
+
+table(subtable3$Condition, subtable3$choseObjectDrop)
+table(subtable4$Condition, subtable4$choseObjectDrop)
+table(subtable5$Condition, subtable5$choseObjectDrop)
+table(subtable6$Condition, subtable6$choseObjectDrop)
+
+#Make a pretty dot graph I hope?
+Scores <- aggregate(sub.long$pragChoice, list(sub.long$Subject), sum)
+names(Scores) <- c("Subject","Score")
+Ages <- sub.long[ !duplicated(sub.long$Subject), c("Subject","Days.Old")]
+
+foo <- merge(Scores,Ages)
+
+foo$JitScore <- jitter(foo$Score)
+
+plot( foo$Days.Old, foo$JitScore)
+
+
+#ANALYSIS by age
+
+
+sub.long56 <- sub.long[sub.long$Age.Years>4,]
+sub.long34 <- sub.long[sub.long$Age.Years<5,]
+sub.long4 <- sub.long34[sub.long34$Age.Years>3,]
 
 #Within age groups
 #5 and 6
@@ -157,12 +186,21 @@ full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|
 no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=sub.long34, family="binomial")
 anova(full_maximal_model, no_fixed)
 
+#4s alone
+full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=sub.long4, family="binomial")
+#compare to model w/o fixed effect
+no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=sub.long4, family="binomial")
+anova(full_maximal_model, no_fixed)
+
 ######
 #Now try age as a factor??
 
+#Scale age (z score), else we get convergence problems
+sub.long$Scaled.Days.Old <- scale(sub.long$Days.Old)
+
 # Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
-full_maximal_model <- lmer(choseObjectDrop ~ Condition*Age.Years + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
-no_age <- lmer(choseObjectDrop ~ Condition+Age.Years + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
+full_maximal_model <- lmer(choseObjectDrop ~ Condition*Scaled.Days.Old + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
+no_age <- lmer(choseObjectDrop ~ Condition+Scaled.Days.Old + (Condition|trial) + (1|Subject), data=sub.long, family="binomial")
 anova(full_maximal_model, no_age)
 
 
