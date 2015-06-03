@@ -24,7 +24,7 @@ directory = getwd()
 subtable = data.frame(NULL)
 
 #Load csv with Alldata into variable
-subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data_42815_thesis.csv"), header = TRUE, stringsAsFactors = FALSE)
+subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data.csv"), header = TRUE, stringsAsFactors = FALSE)
 
 
 #Fix some NA columns
