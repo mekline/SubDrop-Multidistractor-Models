@@ -3,15 +3,15 @@ Subject #,Video Name,Test Date,Gender,Trial A Point,Trial B Point,Trial C Point,
 282,subject_drop_060915_02_blinded.mpg,6/9/15,F,,,,
 283,subject_drop_060915_03_blinded.mpg,6/9/15,F,,,,
 284,subejct_drop_060915_04_blinded.mpg,6/9/15,F,,,,
-285,subject_drop_061315_01_blinded.mpg,6/13/15,F,,,,
-286,subject_drop_061315_02_blinded.mpg,6/13/15,M,,,,
-287,subject-drop_061315_03_blinded.mpg,6/13/15,M,,,,
-288,subject_drop_061315_04_blinded.mpg,6/13/15,M,,,,
-289,subject_drop_061915_01_blinded.mpg,6/19/15,F,,,,
-290,subject_drop_061915_02_blinded.mpg,6/19/15,F,,,,
-291,subject_drop_061915_03_blinded.mpg,6/19/15,M,,,,
-292,subject_drop_062315_01_blinded.mpg,6/23/15,M,,,,
-293,subject_drop_062315_02_blinded.mpg,6/23/15,F,,,,
+285,subject_drop_061315_01_blinded.mpg,6/13/15,F,eat banana,pet dog,baby roll,girl read
+286,subject_drop_061315_02_blinded.mpg,6/13/15,M,n/a,n/a,n/a,n/a
+287,subject-drop_061315_03_blinded.mpg,6/13/15,M,duck eat,boy pet,roll ball,read book
+288,subject_drop_061315_04_blinded.mpg,6/13/15,M,eat banana,pet cat,baby roll,boy read
+289,subject_drop_061915_01_blinded.mpg,6/19/15,F,monkey eat,girl pet,roll ball,read book
+290,subject_drop_061915_02_blinded.mpg,6/19/15,F,eat orange,pet dog,baby roll,boy read
+291,subject_drop_061915_03_blinded.mpg,6/19/15,M,monkey eat ,girl pet ,roll ball,read newspaper 
+292,subject_drop_062315_01_blinded.mpg,6/23/15,M,eat orange,pet dog,baby roll,boy read
+293,subject_drop_062315_02_blinded.mpg,6/23/15,F,monkey eat,girl pet,roll ball,read newspaper 
 294,subject_drop_062315_03_blinded.mpg,6/23/15,M,,,,
 295,subject_drop_062315_04_blinded.mpg,6/23/15,F,,,,
 296,subject_drop_062715_01_blinded.mpg,6/27/15,F,,,,
