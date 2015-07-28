@@ -1,0 +1,5 @@
+dir()
+dir()
+data1 <-read.csv("MelSubDrop.csv", header=TRUE, sep=",")
+data1
+str(data1)
