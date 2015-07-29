@@ -108,3 +108,5 @@ FreqC <- transform(FreqC, cumFreq = cumsum(Freq), relative = prop.table(Freq))
 #Frequency table for Corrct answers in ODSD condition of four year olds
 FreqD <- as.data.frame(table(d))
 FreqD <- transform(FreqD, cumFreq = cumsum(Freq), relative = prop.table(Freq))
+
+
