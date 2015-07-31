@@ -1,4 +1,21 @@
 ## Subject Drop Rscript ##
+
+###Merging####
+#Import my subdrop data#
+SubDrop <-read.csv(file.choose(), header=TRUE)
+#Import Isabella's blind coding#
+BlindData <-read.csv(file.choose(), header=TRUE)
+#Merge both data sets (mine and blind coders)#
+TotalData <- merge(SubDrop, BlindData, by=c("Subject..")) 
+#Match Kid Response (mine) versus Kid Response (blind coder)
+TotalData$match = (as.character(TotalData$Kid.Response.A...Prag.Choice..x) == as.character(TotalData$Kid.Response.A...Prag.Choice..y))
+#Find where the data doesn't match#
+nomatchdata <- TotalData[TotalData$match == FALSE,]
+#Exclude those subjects from mydata#
+myData[-c(1, 9, 16, 17, 19, 25, 29, 32)]
+
+#Calculations/Statistics#
+
 #Import excel spreadsheet#
 mydata <-read.csv(file.choose(), header=TRUE)
 #Desktop->Subject-Drop->MelSubDrop
@@ -8,7 +25,7 @@ dim(mydata)
 #See summary of mydata
 summary(mydata)
 #Calculate mean of "Correct" column
-mean(mydata$correct)
+mean(mydata$Correct)
 #Calculate median of "Correct" column
 median(mydata$correct)
 #Calculate variance of "Correct" column
@@ -25,6 +42,7 @@ max(mydata$correct)
 cor(mydata$Correct, mydata$Age.Years)
 #Spearmen correlation
 cor(mydata$Correct, mydata$Age,Years, method="spearman")
+#Frequency table
 #Data from only three years old
 threeYOdata <- mydata[mydata$Age == 3,]
 #Mean of "Correct" column of Three years old
@@ -108,5 +126,10 @@ FreqC <- transform(FreqC, cumFreq = cumsum(Freq), relative = prop.table(Freq))
 #Frequency table for Corrct answers in ODSD condition of four year olds
 FreqD <- as.data.frame(table(d))
 FreqD <- transform(FreqD, cumFreq = cumsum(Freq), relative = prop.table(Freq))
+#For Standard Error open data of three year olds of SDOD only#
+a
+#Calculate standard error#
+SE <- sd(a)/sqrt(length(a))
+
 
 
