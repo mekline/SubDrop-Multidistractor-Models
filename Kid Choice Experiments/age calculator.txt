@@ -1,4 +1,0 @@
-Age calculator
-
-http://www.calculator.net/age-calculator.html
- change!
