@@ -1,7 +1,5 @@
 ###############################################################
-## Library for tedlab: linguistic acceptability rating surveys on Mechanical Turk
-## October 2009 Steve Piantadosi
-## July, August, September 2010 Ted Gibson
+## Analysis of multi-distractor 'SubDrop' experiment
 ###############################################################
 
 #setwd(mydir)
@@ -298,7 +296,7 @@ mydata$nSubj <- as.numeric(mydata$trialVersion) #This works because trialVersion
 mydata$paycode <- as.factor(mydata$paycode)
 mydata$verb <- as.factor(mydata$verb)
 
-#Here's a good important test!  Try taking out the extreme levels of nSubj to see if everything holds on messy cases!!!!
+#Here's a good important test!  Try taking out the extreme levels of nSubj to see if everything below holds on non-deterministic cases!!!!
 mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
 
 #######
