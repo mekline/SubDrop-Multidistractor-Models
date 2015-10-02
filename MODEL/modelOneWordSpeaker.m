@@ -1,4 +1,4 @@
-function p = modelSpeaker(agentArray, patientArray, varargin)
+function p = modelOneWordSpeaker(agentArray, patientArray, varargin)
 %modelSpeaker takes in a representation of context (array of agents,
 %patients, and optionally verbs) and optionally a specific sentence, and
 %returns the probability that the speaker would choose to generate each
