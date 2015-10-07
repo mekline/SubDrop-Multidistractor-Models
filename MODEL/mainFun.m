@@ -38,11 +38,11 @@ for i=1:6 %Choose a context with 7 total participants
     %REPLACEMENT! This is specialized for the case of an utterance of the form
     %SVO; there's some nice abstracted form which I won't figure right now. 
 
-    %SV
+    %SV (AV)
     pSV = pA*(pV/(pP+pV)) + pV*(pA/(pP+pA));
-    %VO
+    %VO (VP)
     pVO = pV*(pP/(pP+pA)) + pP*(pV/(pV+pA));
-    %SO
+    %SO (AP)
     pSO = pA*(pP/(pP+pV)) + pP*(pA/(pV+pA));
 
     %Get probability word was mentioned, and return that!
