@@ -108,8 +108,9 @@ subtable[subtable$Condition == "SD",]$choseObjectDrop <- 2-subtable[subtable$Con
 maintable <- subtable[subtable$Experiment == "ParentSecret",] 
 conttable <- subtable[subtable$Experiment == "ParentSecretControl" | subtable$Experiment == "ParentSecretControl2",] 
 
-#Toss older accidental participant from conttable, it's just for 3-4yos
+#Toss older/younger accidental participant from conttable, it's just for 3-4yos
 conttable <- conttable[conttable$Age.Years < 5,]
+conttable <- conttable[conttable$Age.Years > 2,]
 
 
 #Look at n kids in sub-experiments (this is good for checking updates on n subjects needed per condition)
@@ -149,6 +150,12 @@ cont.long = wideToLong(conttable,within="trial", sep='_')
 cont.long$choseObjectDrop <- cont.long$pragChoice
 cont.long[cont.long$Condition == "SD",]$choseObjectDrop <- 1-cont.long[cont.long$Condition == "SD",]$pragChoice
 
+#For quick-and-dirty graphs
+table(maintable$Condition, maintable$choseObjectDrop)
+table(maintable$Age.Years, maintable$pragChoiceScore)
+
+table(conttable$Condition, conttable$pragChoiceScore)
+table(conttable$Age.Years, conttable$pragChoiceScore)
 ####################################
 # Analysis!
 
