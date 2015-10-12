@@ -173,13 +173,19 @@ anova(full_maximal_model, no_fixed)
 ###
 #Question 2: Does age influence choice patterns?
 
-#Scale age (z score), else we get convergence problems
+#Scale age (z score), to avoid convergence problems (this worked on some datasets)
 main.long$Scaled.Days.Old <- scale(main.long$Days.Old)
 
 # Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
-full_maximal_model <- lmer(choseObjectDrop ~ Condition*Scaled.Days.Old + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
-no_age <- lmer(choseObjectDrop ~ Condition+Scaled.Days.Old + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
-anova(full_maximal_model, no_age)
+full_maximal_age_model <- lmer(choseObjectDrop ~ Condition*Scaled.Days.Old + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
+#If that doesn't converge, as it doesn't as of 10/10, remove random effects...
+nonmax_age_model <- lmer(choseObjectDrop ~ Condition*Scaled.Days.Old + (1|trial) + (1|Subject), data=main.long, family="binomial")
+
+#Compare to a model without conditionxage interaction, and with same random effects structure as above
+no_age <- lmer(choseObjectDrop ~ Condition+Scaled.Days.Old + (1|trial) + (1|Subject), data=main.long, family="binomial")
+anova(nonmax_age_model, no_age)
+
+#Clearer to understand: just run correctness age model instead?
 
 #Answer #2 yes there is an effect of age!
 
@@ -200,6 +206,7 @@ anova(full_maximal_model_older, no_fixed_older)
 #(MK goes away and decides the most reasonable way to do this...)
 
 
+#TO INCLUDE: Fisher tests of correctness levels of 3s and 4s in the 2 different experiments. Do 4yos answers informativity qs look like 4yso answering correctness qs?
 
 ######Graphs
 
