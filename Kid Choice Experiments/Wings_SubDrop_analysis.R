@@ -1,0 +1,37 @@
+#Analysis of the SubjectDrop study!
+
+#setwd(mydir)
+
+#Reading in all libraries that we (might) use
+library(irr)
+library(stringr)
+library(languageR)
+library(lme4)
+library(multcomp)
+library(binom)
+library(dplyr)
+library(lsr)
+mean.na.rm <- function(x) { mean(x,na.rm=T) }
+sum.na.rm <- function(x) { sum(x,na.rm=T) }
+stderr <- function(x) sqrt(var(x)/length(x))
+
+#Get directory of this file
+directory = getwd()
+
+#Initialize dataset
+subtable = data.frame(NULL)
+
+#Load csv with Alldata into variable
+subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data.csv"), header = TRUE, stringsAsFactors = FALSE)
+
+
+#Fix some badly formatted columns
+subtable$Kid.Response.A...Prag.Choice. <- as.character (subtable$Kid.Response.A...Prag.Choice.)
+subtable$Kid.Response.B...Prag.Choice. <- as.character (subtable$Kid.Response.B...Prag.Choice.)
+subtable$Gender <- subtable$Gender..Guessed.from.Name.Appearance.
+
+subtable[is.na(subtable)] <- 0
+
+#Fix age calculations!
+subtable$Age.Years <- as.numeric(as.character(subtable$Age.Years))
+subtable$Days.Old <- as.numeric(as.character(subtable$Days.Old))
