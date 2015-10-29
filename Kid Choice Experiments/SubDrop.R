@@ -22,7 +22,7 @@ directory = getwd()
 subtable = data.frame(NULL)
 
 #Load csv with Alldata into variable
-subtable = read.csv(paste0(directory, "/SubDropSpeakers_Data.csv"), header = TRUE, stringsAsFactors = FALSE)
+subtable = read.csv(paste0(directory, "/SubDrop_Data.csv"), header = TRUE, stringsAsFactors = FALSE)
 
 
 #Fix some badly formatted columns
@@ -118,13 +118,6 @@ conttable <- conttable[conttable$Age.Years > 2,]
 
 with(maintable, tapply(as.numeric(as.character(Final.Include)), list(Condition, Age.Years), sum.na.rm), drop=TRUE)
 with(conttable, tapply(as.numeric(as.character(Final.Include)), list(Condition, Age.Years), sum.na.rm), drop=TRUE)
-
-
-
-#Everyone! Not that useful while there's different ns per group...
-table(maintable$Condition, maintable$pragChoiceScore, maintable$Age.Years)
-table(conttable$Condition, conttable$pragChoiceScore, conttable$Age.Years)
-
 
 #Make sure factors are coded correctly, and melt the dataset for logistic analyses
 
