@@ -1,4 +1,4 @@
-rm (list = ls(all = TRUE)) # Clean everything
+c <rm (list = ls(all = TRUE)) # Clean everything
 options(warn=-1) # Boot.ci() keeps waning about needing variances for t-intervals. But we don't use those.
 
 # Load packages
