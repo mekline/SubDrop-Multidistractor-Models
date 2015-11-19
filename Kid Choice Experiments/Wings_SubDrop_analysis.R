@@ -35,3 +35,41 @@ subtable[is.na(subtable)] <- 0
 #Fix age calculations!
 subtable$Age.Years <- as.numeric(as.character(subtable$Age.Years))
 subtable$Days.Old <- as.numeric(as.character(subtable$Days.Old))
+
+####### How many questions did the children get right? ######
+# Recode condition variables
+
+#SD: 'subject drop' is the 'correct answer'
+#OD: 'object drop' is the 'correct answer'
+
+subtable$oldCond <- subtable$Condition
+subtable[subtable$Condition == "SDOD",]$Condition <- "SD"
+subtable[subtable$Condition == "ODSD",]$Condition <- "OD"
+
+####Did they get it right? Coding: 1 for right, 0 for wrong.
+#Stories 1 and 2 (can be OD or SD)
+subtable$isPragChoiceA <- "NA"
+#Right
+subtable[subtable$Condition == "SD" & subtable$Kid.Response.A...Prag.Choice. == "eat orange",]$isPragChoiceA <- 1
+subtable[subtable$Condition == "OD" & subtable$Kid.Response.A...Prag.Choice. == "monkey eat",]$isPragChoiceA <- 1
+#Wrong
+subtable[subtable$Condition == "SD" & subtable$Kid.Response.A...Prag.Choice. == "monkey eat",]$isPragChoiceA <- 0
+subtable[subtable$Condition == "OD" & subtable$Kid.Response.A...Prag.Choice. == "eat orange",]$isPragChoiceA <- 0
+subtable[subtable$Condition == "SD" & subtable$Kid.Response.A...Prag.Choice. == "eat banana",]$isPragChoiceA <- 0
+subtable[subtable$Condition == "OD" & subtable$Kid.Response.A...Prag.Choice. == "duck eat",]$isPragChoiceA <- 0
+
+#Stories 3 and 4 (can be OD or SD)
+subtable$isPragChoiceB <- "NA"
+#Right
+subtable[subtable$Condition == "SD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 1
+subtable[subtable$Condition == "OD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 1
+#Wrong
+subtable[subtable$Condition == "SD" & subtable$Kid.Response.B...Prag.Choice. == "girl pet",]$isPragChoiceB <- 0
+subtable[subtable$Condition == "OD" & subtable$Kid.Response.B...Prag.Choice. == "pet dog",]$isPragChoiceB <- 0
+subtable[subtable$Condition == "SD" & subtable$Kid.Response.B...Prag.Choice. == "pet cat",]$isPragChoiceB <- 0
+subtable[subtable$Condition == "SD" & subtable$Kid.Response.B...Prag.Choice. == "pet kitty",]$isPragChoiceB <- 0 #lexical alternative!
+subtable[subtable$Condition == "OD" & subtable$Kid.Response.B...Prag.Choice. == "boy pet",]$isPragChoiceB <- 0
+
+#Total number correct
+subtable$pragChoiceScore <- subtable$isPragChoiceA + subtable$isPragChoiceB
+
