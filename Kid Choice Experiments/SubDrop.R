@@ -198,6 +198,7 @@ anova(full_maximal_model_older, no_fixed_older)
 #Question #4 Can the littles do it at all? Here we just want to ask if the choices are on average different from 50% (Remember that 'conditions' here are just two kinds of true/false!)
 #(MK goes away and decides the most reasonable way to do this...)
 
+#START HERE XXXXX
 
 #TO INCLUDE: Fisher tests of correctness levels of 3s and 4s in the 2 different experiments. Do 4yos answers informativity qs look like 4yso answering correctness qs?
 
