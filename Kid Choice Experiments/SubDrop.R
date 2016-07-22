@@ -1,4 +1,4 @@
-#Analysis of the SubjectDrop study!
+#Analysis of the SubjectDrop kid studies!
 
 #setwd(mydir)
 
@@ -11,6 +11,7 @@ library(multcomp)
 library(binom)
 library(dplyr)
 library(lsr)
+library(EMT)
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
 sum.na.rm <- function(x) { sum(x,na.rm=T) }
 stderr <- function(x) sqrt(var(x)/length(x))
@@ -37,18 +38,19 @@ subtable$Age.Years <- as.numeric(as.character(subtable$Age.Years))
 subtable$Days.Old <- as.numeric(as.character(subtable$Days.Old))
 
 ####################################
-#Pick subset of data to analyze
-
-#Drop non-included kids!
-
-#Right here would be the place to print a table of exclusion reasons.
-
-#New - chose stricter inclusion criteria.., following new paradigm rules (= inconsistent implementation in 1st run)
-subtable <- subtable[subtable$Final.Include == 1,]
+#Pick subset of data to analyze (experiment, kids included)
 
 #Choose ParentSecret and ParentSecretControl study versions
 subtable <- subtable[subtable$Experiment == "ParentSecret" | subtable$Experiment == "ParentSecretControl" | subtable$Experiment == "ParentSecretControl2" ,]
+subtable[subtable$Experiment ==  "ParentSecretControl2",]$Experiment <- "ParentSecretControl"
 
+#chose stricter inclusion criteria.., following new paradigm rules dropped <- subtable[subtable$Final.Include == 0,]
+subtable <- subtable[subtable$Final.Include == 1,]
+
+#who & why excluded from analysis?
+table(dropped$Final.Reason, dropped$Experiment)
+#Note: Bilingual, Developmental delay, no consent, too young/wrong age are outside the intended sample, tested bc it's the museum
+#ExpErrorJ: A series of major implementation flaws were discovered after several months (:( ) - 1st RA implementation was very inconsistently implemented so a large # odf participants must be excluded)
 
 #############################################
 # Recode condition variables
@@ -149,58 +151,119 @@ table(maintable$Age.Years, maintable$pragChoiceScore)
 
 table(conttable$Condition, conttable$pragChoiceScore)
 table(conttable$Age.Years, conttable$pragChoiceScore)
+
+
+
 ####################################
 # Analysis!
 
 ###
-#Question #1 - is choice of OD puppet sensitive to condition?
+# EXPERIMENT 2
+###
+#Question #1 - is choice of OD puppet sensitive to condition? (Figure 6)  ALL AGES, no age factor
 # Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
-full_maximal_model <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
+full_maximal_model <- glmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
 
 #compare to model w/o fixed effect
-no_fixed <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
+no_fixed <- glmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
 anova(full_maximal_model, no_fixed)
 
 #Answer #1 marginal (with all ages included)
 
 ###
-#Question 2: Does age influence choice patterns?
+#Question 2: Here we switch to 'pragmatic choice' bc subject & object order of speaking wasn't counterbalanced. Does age influence choice patterns?
 
-#Scale age (z score), to avoid convergence problems (this worked on some datasets)
+#Scale age (z score), to avoid convergence problems 
 main.long$Scaled.Days.Old <- scale(main.long$Days.Old)
 
 # Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
-full_maximal_age_model <- lmer(choseObjectDrop ~ Condition*Scaled.Days.Old + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
-#If that doesn't converge, as it doesn't as of 10/10, remove random effects...
-nonmax_age_model <- lmer(choseObjectDrop ~ Condition*Scaled.Days.Old + (1|trial) + (1|Subject), data=main.long, family="binomial")
+fullmax_age_model <- glmer(pragChoice ~ Scaled.Days.Old + (1|trial) + (1|Subject), data=main.long, family="binomial")
 
 #Compare to a model without conditionxage interaction, and with same random effects structure as above
-no_age <- lmer(choseObjectDrop ~ Condition+Scaled.Days.Old + (1|trial) + (1|Subject), data=main.long, family="binomial")
-anova(nonmax_age_model, no_age)
+no_age <- glmer(pragChoice ~ 1 + (1|trial) + (1|Subject), data=main.long, family="binomial")
+anova(fullmax_age_model, no_age)
 
-#Clearer to understand: just run correctness age model instead?
-
-#Answer #2 yes there is an effect of age!
-
-#Question 3 What if we consider only older kids? 4yos and up? (Justification - see conttable analyses)
-
-older.long <- main.long[main.long$Age.Years > 4,] 
-# Logistic Regression model.  No (Condition|Subject) random effect because condition was varied between subjects
-full_maximal_model_older <- lmer(choseObjectDrop ~ Condition + (Condition|trial) + (1|Subject), data=older.long, family="binomial")
-
-#compare to model w/o fixed effect
-no_fixed_older <- lmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=older.long, family="binomial")
-anova(full_maximal_model_older, no_fixed_older)
-
-#Answer #3 yup
+#Answer #2: Yes!!
+#Translation for the paper: for each year bin, did they tend to choose the 'correct' pragmatic choice? 
+threes_m <- subset(maintable, Age.Years == 3)
+fours_m <- subset(maintable, Age.Years == 4)
+fives <- subset(maintable, Age.Years == 5)
+sixes <- subset(maintable, Age.Years == 6)
 
 
-#Question #4 Can the littles do it at all? Here we just want to ask if the choices are on average different from 50% (Remember that 'conditions' here are just two kinds of true/false!)
-#(MK goes away and decides the most reasonable way to do this...)
+multinomial.test(as.vector(table(threes_m$pragChoiceScore)),c(0.25, 0.5, 0.25))
+multinomial.test(as.vector(table(fours_m$pragChoiceScore)),c(0.25, 0.5, 0.25))
+multinomial.test(as.vector(table(fives$pragChoiceScore)),c(0.25, 0.5, 0.25))
+multinomial.test(as.vector(table(sixes$pragChoiceScore)),c(0.25, 0.5, 0.25))
 
-#START HERE XXXXX
+###
+# EXPERIMENT 3 - 'Objective' task control; note that 'pragmatic' choice here actually means *correct* (vs incorrect) choice
+# We collapse across Subject/Object question here since, again, no order counterbalancing, so there is just 1 'condition' to examine, age.  
 
-#TO INCLUDE: Fisher tests of correctness levels of 3s and 4s in the 2 different experiments. Do 4yos answers informativity qs look like 4yso answering correctness qs?
+#Question 1 (skip, no interpretable condition difference here)
+
+#Question 2 (parallel above): Does age influence choice patterns?
+
+#Scale age (z score), to avoid convergence problems 
+cont.long$Scaled.Days.Old <- scale(cont.long$Days.Old)
+
+# Logistic Regression model.  
+full_max_cont_model <- glmer(pragChoice ~ Scaled.Days.Old + (1|trial) + (1|Subject), data=cont.long, family="binomial")
+#Compare to a model without age interaction, and with same random effects structure as above
+no_age_cont_model <- glmer(pragChoice ~ 1 + (1|trial) + (1|Subject), data=cont.long, family="binomial")
+anova(full_max_cont_model, no_age_cont_model)
+
+#Answer #2:We measure no significant difference!(but it wouldn't be crazy if there was one, p = 0.1)
+
+#Translation for the paper: for each year bin, did they tend to choose the 'correct' pragmatic choice? Yes they do, but the 4s are numerically better
+threes_c <- subset(conttable, Age.Years == 3)
+fours_c <- subset(conttable, Age.Years == 4)
+
+multinomial.test(as.vector(table(threes_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
+multinomial.test(as.vector(table(fours_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
+
+
+### Question #3 Do 3s and 4s differ in the two tasks? 
+# We know: 3s and 4s both significantly above chance in cont task, only 4s above change in main; and only main, not cont shows a continuous age effect (tho cont is not crazy far away)
+# But are the tasks actually different from one another by age?
+
+#To answer, make a new dataset with both tasks and just the 3-4yos
+main.long$Task <- 'main'
+cont.long$Task <- 'cont'
+threefour.long <- subset(rbind(main.long, cont.long), Age.Years < 5)
+
+full_max_three_model <- glmer(pragChoice ~ Task*Scaled.Days.Old + (Task|trial) + (1|Subject), data=threefour.long, family="binomial")
+#Doesn't converge, remove fx
+nomax_three_model <- glmer(pragChoice ~ Task*Scaled.Days.Old + (1|trial) + (1|Subject), data=threefour.long, family="binomial")
+
+#Compare to model without interaction
+noeff_three_model <- glmer(pragChoice ~ Task+Scaled.Days.Old + (1|trial) + (1|Subject), data=threefour.long, family="binomial")
+anova(nomax_three_model,noeff_three_model) # comes out p=.27
+
+#Confusing! No task/age interaction. Trying the binned version:
+threetab <- rbind(as.vector(table(threes_c$pragChoiceScore)), as.vector(table(threes_m$pragChoiceScore)))
+fourtab <- rbind(as.vector(table(fours_c$pragChoiceScore)), as.vector(table(fours_m$pragChoiceScore)))
+
+multinomial.test(as.vector(table(threes_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
+multinomial.test(as.vector(table(fours_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
+
+
+
+
+#A final power analysis.
+
+#1) Assume they are at change for prag and at observed for t/f task. What is the nsubj needed to test for a difference with 1 trial
+
+p1 = mean(subset(cont.long, Age.Years < 4)$pragChoice)
+
+multi = c(p1^2, 2*p1*(1-p1), (1-p1)^2)
+nullmulti = c(0.25,0.5,0.25)
+
+w = sqrt(((multi[1]-nullmulti[1])^2)/nullmulti[1] + ((multi[2]-nullmulti[2])^2)/nullmulti[2] + ((multi[3]-nullmulti[3])^2)/nullmulti[3])
+
+pwr.chisq.test(w = w,  sig.level = 0.05, power = 0.8, df=2)
+############
+############
 
 ######Graphs
 
