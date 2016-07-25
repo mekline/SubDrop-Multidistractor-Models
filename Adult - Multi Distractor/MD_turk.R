@@ -9,6 +9,9 @@ library(lme4)
 library(stringr)
 library(binom)
 library(bootstrap)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 source("tedlab-misc.R")
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
 
@@ -250,10 +253,6 @@ mentionVb_6.boot.mean = bootstrap(mydata[mydata$trialVersion=="6_1",]$mentionVer
 quantile(mentionVb_6.boot.mean$thetastar, c(0.025, 0.975))
 
 
-
-
-
-
 ########
 #Lump by subject to get frequency scores! Just for fun There are 2 trials per version (1_6, etc)
 
@@ -297,7 +296,7 @@ mydata$paycode <- as.factor(mydata$paycode)
 mydata$verb <- as.factor(mydata$verb)
 
 #Here's a good important test!  Try taking out the extreme levels of nSubj to see if everything below holds on non-deterministic cases!!!!
-mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
+#mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
 
 #######
 #We can test a few different outcome measures, e.g., whether Subject was mentioned
@@ -343,11 +342,83 @@ diffdata$wasOb <- diffdata$Only == "ObOnly"
 #Test!
 binom.test(sum(diffdata$wasOb), nrow(diffdata))
 
+###############
+# GRAPHS
+###############
+
+#Reorganize the data
+mylong <- mydata %>% 
+  gather("whichElement","isMentioned", mentionObject, mentionSubject, mentionVerb) %>%
+  group_by(trialVersion, whichElement) %>%
+  summarise(mentionMean = mean(isMentioned))
+
+
+
+errorbarsV <- list(mentionVb_1.boot.mean,mentionVb_2.boot.mean,mentionVb_3.boot.mean,mentionVb_4.boot.mean,mentionVb_5.boot.mean,mentionVb_6.boot.mean)
+errorbarsS <- list(mentionSb_1.boot.mean,mentionSb_2.boot.mean,mentionSb_3.boot.mean,mentionSb_4.boot.mean,mentionSb_5.boot.mean,mentionSb_6.boot.mean)
+errorbarsO <- list(mentionOb_1.boot.mean,mentionOb_2.boot.mean,mentionOb_3.boot.mean,mentionOb_4.boot.mean,mentionOb_5.boot.mean,mentionOb_6.boot.mean)
+trials <- list("1_6","2_5","3_4","4_3","5_2","6_1")
+trial_label <- list("1 agent, 6 patients", "2 agents, 5 patients","3 agents, 4 patients","4 agents, 3 patients","5 agents, 2 patients","6 agents, 1 patient")
+mylong$error_high <- 0
+mylong$error_low <- 0
+mylong$condLabel <- ""
+mylong$trialLabel <- ""
+mylong[mylong$whichElement == "mentionSubject",]$condLabel <- "Subject"
+mylong[mylong$whichElement == "mentionObject",]$condLabel <- "Object"
+mylong[mylong$whichElement == "mentionVerb",]$condLabel <- "Verb"
+
+mylong$condLabel <- factor(mylong$condLabel, levels = c("Subject", "Object","Verb"))
+for (i in 1:6) {
+  
+  vv <- errorbarsV[[i]]
+  ss <- errorbarsS[[i]]
+  oo <- errorbarsO[[i]]
+  mylong[(mylong$trialVersion == trials[[i]]),]$trialLabel <- trial_label[[i]] 
+
+  mylong[(mylong$trialVersion == trials[[i]]) & (mylong$whichElement == "mentionSubject"),]$error_high <- quantile(ss$thetastar, c(0.025, 0.975))[2]
+  mylong[(mylong$trialVersion == trials[[i]]) & (mylong$whichElement == "mentionSubject"),]$error_low <- quantile(ss$thetastar, c(0.025, 0.975))[1]
+  mylong[(mylong$trialVersion == trials[[i]]) & (mylong$whichElement == "mentionObject"),]$error_high <- quantile(oo$thetastar, c(0.025, 0.975))[2]
+  mylong[(mylong$trialVersion == trials[[i]]) & (mylong$whichElement == "mentionObject"),]$error_low <- quantile(oo$thetastar, c(0.025, 0.975))[1]
+  mylong[(mylong$trialVersion == trials[[i]]) & (mylong$whichElement == "mentionVerb"),]$error_high <- quantile(vv$thetastar, c(0.025, 0.975))[2]
+  mylong[(mylong$trialVersion == trials[[i]]) & (mylong$whichElement == "mentionVerb"),]$error_low <- quantile(vv$thetastar, c(0.025, 0.975))[1]
+
+ 
+}
+
+library(RColorBrewer)
+my.cols <- brewer.pal(9, "Purples")
+my.cols <- rev(my.cols[4:9])
+
+
+ggplot(data=mylong, aes(x=condLabel, y=mentionMean, fill=trialLabel)) + 
+  geom_bar(position=position_dodge(), stat="identity") +
+  geom_errorbar(aes(ymin=error_high, ymax=error_low), colour="black", width=.1, position=position_dodge(.9)) +
+  coord_cartesian(ylim=c(0,1)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.5))+
+  xlab('') +
+  ylab('proportion of trials mentioning word') +
+  scale_fill_manual(name="", values=my.cols) +
+  theme(legend.key = element_blank()) +
+  theme_bw() +
+  theme(strip.background = element_blank()) +
+  theme(text = element_text(family="Times", size=rel(4))) +
+  theme(legend.text = element_text(family="Times", size=rel(4))) +
+  theme(axis.text = element_text(family="Times", size=rel(0.9)))
+
+
+
+
+ggsave(filename="humanPerformance.jpg", width=10, height=6)
 
 
 
 
 ########################
+
+
+
+##### Extra analyses
+##################################3
 
 #######
 #Double checking: ask whether SV solution was used
@@ -365,12 +436,6 @@ anova(full_maximal_model, random_slope_model)
 
 
 
-
-
-
-
-##### Extra analyses
-##################################3
 #We looked at verb surprisals, but they weren't very informative. (We jsut asked people how surprising the verb was given the agent & patient sets, e.g. THROW fruit vs. EAT fruit)
 
 #First look at the data - for each verb, how often included? what average surprisal?

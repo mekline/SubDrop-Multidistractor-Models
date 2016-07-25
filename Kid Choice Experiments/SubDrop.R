@@ -23,7 +23,7 @@ directory = getwd()
 subtable = data.frame(NULL)
 
 #Load csv with Alldata into variable
-subtable = read.csv(paste0(directory, "/SubDrop_Data.csv"), header = TRUE, stringsAsFactors = FALSE)
+subtable = read.csv(paste0(directory, "/SubDrop_Data2.csv"), header = TRUE, stringsAsFactors = FALSE)
 
 
 #Fix some badly formatted columns
@@ -246,6 +246,46 @@ fourtab <- rbind(as.vector(table(fours_c$pragChoiceScore)), as.vector(table(four
 
 multinomial.test(as.vector(table(threes_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
 multinomial.test(as.vector(table(fours_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
+
+
+#######
+# GRAPHS
+#######
+all.long <- rbind(main.long, cont.long) %>%
+  group_by(Subject, Age.Years, Experiment) %>%
+  summarise(pragScore = sum(pragChoice)) %>%
+  group_by(Age.Years, Experiment, pragScore) %>%
+  summarise(pragNum = length(pragScore)) %>% #gosh this is easier, hooray for hadley!
+  filter(Age.Years > 2) %>%
+  filter(Age.Years < 7)
+
+#Labels/formats for graphing
+all.long$Age.Years <- factor(all.long$Age.Years, levels = unique(all.long$Age.Years))
+all.long$pragScore <- factor(all.long$pragScore, levels = unique(all.long$pragScore))
+all.long$ExpLabel = ""
+all.long[all.long$Experiment == "ParentSecret",]$ExpLabel <- "Main experiment (helpful/unhelpful)"
+all.long[all.long$Experiment == "ParentSecretControl",]$ExpLabel <- "Control (true/false)"
+all.long$ExpLabel <- factor(all.long$ExpLabel, levels = c("Main experiment (helpful/unhelpful)", "Control (true/false)"))
+
+library(RColorBrewer)
+my.cols <- brewer.pal(7, "Oranges")
+my.cols <- my.cols[c(2,4,6)]
+
+ggplot(data=all.long, aes(x=Age.Years, y=pragNum, fill=pragScore)) + 
+  geom_bar(position=position_dodge(), stat="identity") +
+  facet_grid(~ExpLabel, scale='free_x', space='free_x') +
+  coord_cartesian(ylim=c(0,16)) +
+  xlab('Age in years') +
+  ylab('Number of children') +
+  scale_fill_manual(name="", values=my.cols) +
+  theme_bw() +
+  theme(legend.key = element_blank()) +
+  facet_grid(~ROIGroup, scale='free_x', space='free_x') +
+  theme(strip.background = element_blank()) +
+  # Optional, remove for RHLang and ToMCustom since we want the legend there...
+  theme(legend.position="none")
+
+  
 
 
 
