@@ -2,9 +2,9 @@ c <rm (list = ls(all = TRUE)) # Clean everything
 options(warn=-1) # Boot.ci() keeps whining about needing variances for t-intervals. But we don't use those.
 
 # Load packages
+library(plyr)
 library(tidyr)
 library(dplyr)
-library(plyr)
 library(ggplot2)
 library(Hmisc)
 
@@ -23,12 +23,12 @@ mhdata <- read.csv("Human_Model_Data.csv")
 #melt this into a nicer shape! (row = Condition + target word + human, model judgments)
 
 confints <- mhdata %>%
-  select(one_of("Condition", "Word", "conf.Upper","conf.Lower")) %>%
+  dplyr::select(one_of("Condition", "Word", "conf.Upper","conf.Lower")) %>%
   filter(!is.na(conf.Upper))
 names(confints) <- c("Condition", "Word", "Human.conf.Upper","Human.conf.Lower")
 
 mhdata <- mhdata %>%
-  select(one_of(c("Source","Word","Condition","p.Include"))) %>%
+  dplyr::select(one_of(c("Source","Word","Condition","p.Include"))) %>%
   spread(Source, p.Include) %>%
   merge(confints, by=c("Condition","Word"))
 
@@ -62,14 +62,13 @@ ggplot(data=mhdata, aes(x=Word, y=Model.v5, fill=trialLabel)) +
   scale_y_continuous(breaks = seq(0, 1, 0.5))+
   xlab('') +
   ylab('p(include word), k=5') +
-  scale_fill_manual(name="", values=my.cols) +
   theme(legend.key = element_blank()) +
-  theme_bw() +
   theme(strip.background = element_blank()) +
+  theme_bw() +
+  scale_fill_manual(name="", values=my.cols) +
   theme(text = element_text(family="Times", size=rel(4))) +
   theme(legend.text = element_text(family="Times", size=rel(4))) +
   theme(axis.text = element_text(family="Times", size=rel(0.9)))
-
 
 ggsave(filename="v5.jpg", width=10, height=6)
 
@@ -80,11 +79,12 @@ ggplot(data=mhdata, aes(x=Word, y=Model.v50, fill=trialLabel)) +
   xlab('') +
   ylab('p(include word), k=50') +
   theme(legend.key = element_blank()) +
-  theme_bw() +
   theme(strip.background = element_blank()) +
+  theme_bw() +
   scale_fill_manual(name="", values=my.cols) +
   theme(text = element_text(family="Times", size=rel(4))) +
   theme(legend.text = element_text(family="Times", size=rel(4))) +
   theme(axis.text = element_text(family="Times", size=rel(0.9)))
-
+  
+  
 ggsave(filename="v50.jpg", width=10, height=6)

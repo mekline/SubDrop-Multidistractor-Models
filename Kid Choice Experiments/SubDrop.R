@@ -12,6 +12,7 @@ library(binom)
 library(dplyr)
 library(lsr)
 library(EMT)
+library(ggplot2)
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
 sum.na.rm <- function(x) { sum(x,na.rm=T) }
 stderr <- function(x) sqrt(var(x)/length(x))
@@ -23,7 +24,7 @@ directory = getwd()
 subtable = data.frame(NULL)
 
 #Load csv with Alldata into variable
-subtable = read.csv(paste0(directory, "/SubDrop_Data2.csv"), header = TRUE, stringsAsFactors = FALSE)
+subtable = read.csv(paste0(directory, "/SubDrop_reconciled.csv"), header = TRUE, stringsAsFactors = FALSE)
 
 
 #Fix some badly formatted columns
@@ -45,6 +46,8 @@ subtable <- subtable[subtable$Experiment == "ParentSecret" | subtable$Experiment
 subtable[subtable$Experiment ==  "ParentSecretControl2",]$Experiment <- "ParentSecretControl"
 
 #chose stricter inclusion criteria.., following new paradigm rules dropped <- subtable[subtable$Final.Include == 0,]
+dropped <- subtable[subtable$Final.Include == 0,]
+
 subtable <- subtable[subtable$Final.Include == 1,]
 
 #who & why excluded from analysis?
@@ -168,7 +171,7 @@ full_maximal_model <- glmer(choseObjectDrop ~ Condition + (Condition|trial) + (1
 no_fixed <- glmer(choseObjectDrop ~ 1 + (Condition|trial) + (1|Subject), data=main.long, family="binomial")
 anova(full_maximal_model, no_fixed)
 
-#Answer #1 marginal (with all ages included)
+#Answer #1 marginal (p=0.09) (with all ages included)
 
 ###
 #Question 2: Here we switch to 'pragmatic choice' bc subject & object order of speaking wasn't counterbalanced. Does age influence choice patterns?
@@ -197,7 +200,7 @@ multinomial.test(as.vector(table(fives$pragChoiceScore)),c(0.25, 0.5, 0.25))
 multinomial.test(as.vector(table(sixes$pragChoiceScore)),c(0.25, 0.5, 0.25))
 
 ###
-# EXPERIMENT 3 - 'Objective' task control; note that 'pragmatic' choice here actually means *correct* (vs incorrect) choice
+# 'Objective' task control; note that 'pragmatic' choice here actually means *correct* (vs incorrect) choice
 # We collapse across Subject/Object question here since, again, no order counterbalancing, so there is just 1 'condition' to examine, age.  
 
 #Question 1 (skip, no interpretable condition difference here)
@@ -215,7 +218,7 @@ anova(full_max_cont_model, no_age_cont_model)
 
 #Answer #2:We measure no significant difference!(but it wouldn't be crazy if there was one, p = 0.1)
 
-#Translation for the paper: for each year bin, did they tend to choose the 'correct' pragmatic choice? Yes they do, but the 4s are numerically better
+#Translation for the paper: for each year bin, did they tend to choose the 'correct' pragmatic choice? Yes they do, but the 4s are numerically better than 3s on this task
 threes_c <- subset(conttable, Age.Years == 3)
 fours_c <- subset(conttable, Age.Years == 4)
 
@@ -233,20 +236,21 @@ cont.long$Task <- 'cont'
 threefour.long <- subset(rbind(main.long, cont.long), Age.Years < 5)
 
 full_max_three_model <- glmer(pragChoice ~ Task*Scaled.Days.Old + (Task|trial) + (1|Subject), data=threefour.long, family="binomial")
-#Doesn't converge, remove fx
+noeff_three_model <- glmer(pragChoice ~ Task+Scaled.Days.Old + (Task|trial) + (1|Subject), data=threefour.long, family="binomial")
+
+#Doesn't converge! So test again with (1|trial)
 nomax_three_model <- glmer(pragChoice ~ Task*Scaled.Days.Old + (1|trial) + (1|Subject), data=threefour.long, family="binomial")
+nomaxnoeff_three_model <- glmer(pragChoice ~ Task+Scaled.Days.Old + (1|trial) + (1|Subject), data=threefour.long, family="binomial")
 
-#Compare to model without interaction
-noeff_three_model <- glmer(pragChoice ~ Task+Scaled.Days.Old + (1|trial) + (1|Subject), data=threefour.long, family="binomial")
-anova(nomax_three_model,noeff_three_model) # comes out p=.27
+anova(nomax_three_model,nomaxnoeff_three_model) # comes out p=.3
+#Confusing! No task/age interaction. 
 
-#Confusing! No task/age interaction. Trying the binned version:
+#Trying the binned version:
 threetab <- rbind(as.vector(table(threes_c$pragChoiceScore)), as.vector(table(threes_m$pragChoiceScore)))
 fourtab <- rbind(as.vector(table(fours_c$pragChoiceScore)), as.vector(table(fours_m$pragChoiceScore)))
 
-multinomial.test(as.vector(table(threes_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
-multinomial.test(as.vector(table(fours_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
-
+fisher.test(threetab)
+fisher.test(fourtab)
 
 #######
 # GRAPHS
@@ -277,31 +281,20 @@ ggplot(data=all.long, aes(x=Age.Years, y=pragNum, fill=pragScore)) +
   coord_cartesian(ylim=c(0,16)) +
   xlab('Age in years') +
   ylab('Number of children') +
-  scale_fill_manual(name="", values=my.cols) +
-  theme_bw() +
   theme(legend.key = element_blank()) +
-  facet_grid(~ROIGroup, scale='free_x', space='free_x') +
+  theme_bw() +
   theme(strip.background = element_blank()) +
-  # Optional, remove for RHLang and ToMCustom since we want the legend there...
-  theme(legend.position="none")
+  scale_fill_manual(name="", values=my.cols) +
+  theme(text = element_text(family="Times", size=rel(4))) +
+  theme(legend.text = element_text(family="Times", size=rel(4))) +
+  theme(axis.text = element_text(family="Times", size=rel(0.9))) +
+  theme(strip.text = element_text(family="Times", size=rel(0.9)))
 
-  
+
+ggsave(filename="kid_subdrop.jpg", width=10, height=6)
 
 
 
-
-#A final power analysis.
-
-#1) Assume they are at change for prag and at observed for t/f task. What is the nsubj needed to test for a difference with 1 trial
-
-p1 = mean(subset(cont.long, Age.Years < 4)$pragChoice)
-
-multi = c(p1^2, 2*p1*(1-p1), (1-p1)^2)
-nullmulti = c(0.25,0.5,0.25)
-
-w = sqrt(((multi[1]-nullmulti[1])^2)/nullmulti[1] + ((multi[2]-nullmulti[2])^2)/nullmulti[2] + ((multi[3]-nullmulti[3])^2)/nullmulti[3])
-
-pwr.chisq.test(w = w,  sig.level = 0.05, power = 0.8, df=2)
 ############
 ############
 
@@ -319,3 +312,15 @@ foo$JitScore <- jitter(foo$Score)
 
 plot( foo$Days.Old, foo$JitScore)
 
+#A final power analysis.
+
+#1) Assume they are at change for prag and at observed for t/f task. What is the nsubj needed to test for a difference with 1 trial
+
+p1 = mean(subset(cont.long, Age.Years < 4)$pragChoice)
+
+multi = c(p1^2, 2*p1*(1-p1), (1-p1)^2)
+nullmulti = c(0.25,0.5,0.25)
+
+w = sqrt(((multi[1]-nullmulti[1])^2)/nullmulti[1] + ((multi[2]-nullmulti[2])^2)/nullmulti[2] + ((multi[3]-nullmulti[3])^2)/nullmulti[3])
+
+pwr.chisq.test(w = w,  sig.level = 0.05, power = 0.8, df=2)
