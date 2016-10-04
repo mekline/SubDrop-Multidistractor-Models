@@ -17,7 +17,7 @@ mean.na.rm <- function(x) { mean(x,na.rm=T) }
 
 turk.files <- list.files('batch')
 willow.files <- list.files('log')
-verb.files <- list.files('ratings')
+#verb.files <- list.files('ratings')
 		
 ###############################################################
 ## Read in the data files from turk
@@ -49,26 +49,26 @@ for (w in willow.files) {
 willowdata <- willowdata[willowdata$paycode != "paycode",]
 willowdata$Paycode <- willowdata$paycode
 
-###############################################################
-## Read in the data files from verb ratings!!
-verbdata <- data.frame(NULL)
-for (w in verb.files) {
-	tmp <- read.csv(paste('ratings/',w, sep=''), header=T)
-	tmp$verbfile <- w
-	tmp$verbcode <- paste(unlist(str_extract_all(w,"[0-9+]")),collapse='')
-	verbdata <- rbind(verbdata, tmp)
-}
-
-#Remove extra header lines...
-verbdata <- verbdata[verbdata$paycode != "paycode",]
-verbdata$Paycode <- verbdata$paycode
+# ###############################################################
+# ## Read in the data files from verb ratings!!
+# verbdata <- data.frame(NULL)
+# for (w in verb.files) {
+# 	tmp <- read.csv(paste('ratings/',w, sep=''), header=T)
+# 	tmp$verbfile <- w
+# 	tmp$verbcode <- paste(unlist(str_extract_all(w,"[0-9+]")),collapse='')
+# 	verbdata <- rbind(verbdata, tmp)
+# }
+# 
+# #Remove extra header lines...
+# verbdata <- verbdata[verbdata$paycode != "paycode",]
+# verbdata$Paycode <- verbdata$paycode
 
 ###############################################################
 ## Merge the information from turk and willow!  
 
 #How many do we start with?
 length(unique(willowdata$Paycode)) #112
-length(unique(verbdata$Paycode)) #102
+#length(unique(verbdata$Paycode)) #102
 length(unique(turkdata$WorkerId)) #100
 
 #Save and standardize
@@ -80,7 +80,7 @@ willowdata$HasWillow <- TRUE
 
 mydata <- NULL
 mydata <- merge(willowdata, turkdata, by=c("Paycode"), all.x=TRUE, all.y=TRUE)
-mydata <- merge(mydata, verbdata, by=c("Paycode", "stimNo", "paycode", "verb"), all.x=TRUE, all.y=TRUE)
+#mydata <- merge(mydata, verbdata, by=c("Paycode", "stimNo", "paycode", "verb"), all.x=TRUE, all.y=TRUE)
 
 #If your line doesn't have Willow, you are a useless unmatched Turk entry!
 
@@ -280,7 +280,20 @@ with(mentionVO, tapply(mentionVO, list(trialVersion), mean, na.rm=TRUE), drop=TR
 with(mentionSV, tapply(mentionSV, list(trialVersion), my.sd), drop=TRUE)
 with(mentionVO, tapply(mentionVO, list(trialVersion), my.sd), drop=TRUE)
 
+########
+# Right here, calculate empirical percentages in a random split-half, for the modeling comparisons
 
+set.seed(223344)
+mydata$randomHalf <- runif(nrow(mydata),0,1) > 0.5
+r1 <- mydata[mydata$randomHalf,]
+r2 <- mydata[!(mydata$randomHalf),]
+
+aggregate(r1$mentionSubject, by = list(r1$trialVersion), mean)
+aggregate(r1$mentionObject, by = list(r1$trialVersion), mean)
+aggregate(r1$mentionVerb, by = list(r1$trialVersion), mean)
+aggregate(r2$mentionSubject, by = list(r2$trialVersion), mean)
+aggregate(r2$mentionObject, by = list(r2$trialVersion), mean)
+aggregate(r2$mentionVerb, by = list(r2$trialVersion), mean)
 
 ################################################
 

@@ -102,7 +102,7 @@ for i=1:6
             [includeS, includeO, includeV] = get2([pS,pO,pV]);
             probs = [probs; includeS, includeO, includeV]; %Sanity check! This should give back the empirical observations, and they do.
             
-        case 'succeedorfail' %Try both combinations! (unordered, always includes V)
+        case 'succeedorfail' %Try both combinations, stick to a successful one if there is! (unordered, always includes V)
             includeV = 1;
             
             %SV works?
@@ -111,8 +111,8 @@ for i=1:6
             succeedO = length(contextS) == 1;
             
             %Normalize baserates to S and O
-            includeS = empirical(1)/(empirical(1) + empirical(2));
-            includeO = empirical(2)/(empirical(1) + empirical(2));
+            includeS = 0.5;
+            includeO = 0.5;
             
             if (not(succeedS + succeedO == 0)) %There is a successful solution! Renormalize
                 pSV = includeS*succeedS;

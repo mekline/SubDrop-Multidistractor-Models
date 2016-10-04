@@ -224,10 +224,12 @@ fours_c <- subset(conttable, Age.Years == 4)
 
 multinomial.test(as.vector(table(threes_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
 multinomial.test(as.vector(table(fours_c$pragChoiceScore)),c(0.25, 0.5, 0.25))
+conttab <- rbind(as.vector(table(fours_c$pragChoiceScore)), as.vector(table(threes_c$pragChoiceScore)))
 
+fisher.test(threetab)
 
 ### Question #3 Do 3s and 4s differ in the two tasks? 
-# We know: 3s and 4s both significantly above chance in cont task, only 4s above change in main; and only main, not cont shows a continuous age effect (tho cont is not crazy far away)
+# We know: 3s and 4s both significantly above chance in cont task, only 4s above change in main; and only main task shows a continuous age effect
 # But are the tasks actually different from one another by age?
 
 #To answer, make a new dataset with both tasks and just the 3-4yos
@@ -235,15 +237,14 @@ main.long$Task <- 'main'
 cont.long$Task <- 'cont'
 threefour.long <- subset(rbind(main.long, cont.long), Age.Years < 5)
 
-full_max_three_model <- glmer(pragChoice ~ Task*Scaled.Days.Old + (Task|trial) + (1|Subject), data=threefour.long, family="binomial")
-noeff_three_model <- glmer(pragChoice ~ Task+Scaled.Days.Old + (Task|trial) + (1|Subject), data=threefour.long, family="binomial")
-
-#Doesn't converge! So test again with (1|trial)
+#full_max_three_model <- glmer(pragChoice ~ Task*Scaled.Days.Old + (Task|trial) + (1|Subject), data=threefour.long, family="binomial")
+#noeff_three_model <- glmer(pragChoice ~ Task+Scaled.Days.Old + (Task|trial) + (1|Subject), data=threefour.long, family="binomial")
+#that last doesn't converge! So test again with (1|trial)
 nomax_three_model <- glmer(pragChoice ~ Task*Scaled.Days.Old + (1|trial) + (1|Subject), data=threefour.long, family="binomial")
 nomaxnoeff_three_model <- glmer(pragChoice ~ Task+Scaled.Days.Old + (1|trial) + (1|Subject), data=threefour.long, family="binomial")
 
 anova(nomax_three_model,nomaxnoeff_three_model) # comes out p=.3
-#Confusing! No task/age interaction. 
+#No task/age interaction!
 
 #Trying the binned version:
 threetab <- rbind(as.vector(table(threes_c$pragChoiceScore)), as.vector(table(threes_m$pragChoiceScore)))
@@ -270,17 +271,21 @@ all.long$ExpLabel = ""
 all.long[all.long$Experiment == "ParentSecret",]$ExpLabel <- "Main experiment (helpful/unhelpful)"
 all.long[all.long$Experiment == "ParentSecretControl",]$ExpLabel <- "Control (true/false)"
 all.long$ExpLabel <- factor(all.long$ExpLabel, levels = c("Main experiment (helpful/unhelpful)", "Control (true/false)"))
-
+all.long$PragLabel = ""
+all.long[all.long$pragScore == 0,]$PragLabel <- 'n=0'
+all.long[all.long$pragScore == 1,]$PragLabel <- 'n=1'
+all.long[all.long$pragScore == 2,]$PragLabel <- 'n=2'
+all.long$PragLabel <- factor(all.long$PragLabel, levels = c("n=0","n=1","n=2"))
 library(RColorBrewer)
 my.cols <- brewer.pal(7, "Oranges")
 my.cols <- my.cols[c(2,4,6)]
 
-ggplot(data=all.long, aes(x=Age.Years, y=pragNum, fill=pragScore)) + 
+ggplot(data=all.long, aes(x=Age.Years, y=pragNum, fill=PragLabel)) + 
   geom_bar(position=position_dodge(), stat="identity") +
   facet_grid(~ExpLabel, scale='free_x', space='free_x') +
   coord_cartesian(ylim=c(0,16)) +
   xlab('Age in years') +
-  ylab('Number of children') +
+  ylab('Number of children choosing n helpful/correct') +
   theme(legend.key = element_blank()) +
   theme_bw() +
   theme(strip.background = element_blank()) +
