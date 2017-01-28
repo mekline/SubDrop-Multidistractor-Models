@@ -49,20 +49,6 @@ for (w in willow.files) {
 willowdata <- willowdata[willowdata$paycode != "paycode",]
 willowdata$Paycode <- willowdata$paycode
 
-# ###############################################################
-# ## Read in the data files from verb ratings!!
-# verbdata <- data.frame(NULL)
-# for (w in verb.files) {
-# 	tmp <- read.csv(paste('ratings/',w, sep=''), header=T)
-# 	tmp$verbfile <- w
-# 	tmp$verbcode <- paste(unlist(str_extract_all(w,"[0-9+]")),collapse='')
-# 	verbdata <- rbind(verbdata, tmp)
-# }
-# 
-# #Remove extra header lines...
-# verbdata <- verbdata[verbdata$paycode != "paycode",]
-# verbdata$Paycode <- verbdata$paycode
-
 ###############################################################
 ## Merge the information from turk and willow!  
 
@@ -110,7 +96,7 @@ mydata[is.na(mydata$HasTurk),]$Answer.country <- "USA"
 ## Recode and clean data & conditions
 
 #Check for number of legal responses given in a single session!!
-
+#mistakeFlag - on your first attempt, you put more than 1 word in a text box and were told to correct it. We exclude these.
 mydata[is.na(mydata$mistakeFlag),]$mistakeFlag <- 'bad input'
 mydata[mydata$mistakeFlag == '',]$mistakeFlag <- 'bad input' #Fix up missing values
 
@@ -152,7 +138,7 @@ unique(mydata$WorkerId)
 mydata <- mydata[mydata$Answer.country == "USA" &
 		mydata$Answer.English == "yes" &
 		mydata$VideoProblem == "FALSE" &
-		mydata$LegalAnswers > 8,] #You did at least 3/4 of the trials
+		mydata$LegalAnswers > 8,] #You did at least 3/4 of the trials (i.e. you entered some two-word answer that trial on your first try)
 		
 #Throw out people who only had turk data (no code given...)
 mydata <- mydata[!is.na(mydata$HasWillow),]
@@ -170,7 +156,7 @@ length(unique(mydata$Paycode)) #91
 #######
 
 #Code whether each argument is included in the answer!
-
+git
 mydata$mentionSubject <- FALSE
 mydata[mydata$word1_CODED == 'AGENT',]$mentionSubject <- TRUE
 mydata[mydata$word2_CODED == 'AGENT',]$mentionSubject <- TRUE
