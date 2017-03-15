@@ -1,13 +1,7 @@
 # Subject-Drop
 
-Studies on pragmatics of argument dropping: Adults and children communication tasks involving transitive events described with just two words.
-Are they sensitive to context/number of potential role-fillers?
+Paper title: Nothing but the truth, but not the whole truth: Adults choose to mention agents and patients in proportion to informativity, even if it doesn’t fully disambiguate the message
 
-<a href="http://www.calculator.net/age-calculator.html">Link to age calculator!</a>
+### Abstract
 
-***
-
-some RA notes summer 2015
-MelSubDrop.csv = SubDrop_Data.csv rows of 3-4yos from summer
-
-SubDrop (data for merge).csv - MelSubDrop.csv subsetted columns
+How do we decide what to say to ensure our meanings will be understood? The Rational Speech Act model (RSA, Frank & Goodman, 2012) asserts that speakers plan what to say by comparing the informativity of words in a particular context. We present the first example of an RSA model of sentence level (who-did-what-to-whom) meanings. In these contexts, the set of possible messages must be abstracted from entities in common ground (people and objects) to possible events (*Jane eats the apple, Marco peels the banana*), with each word contributing unique semantic content. How do speakers accomplish the transformation from context to compositional messages? In a communication game, participants described transitive events (e.g. Jane pets the dog), with only two words, in contexts where two words either were or were not enough to uniquely identify an event. Adults chose utterances matching the predictions of the RSA even when there was no possible fully successful choice. Thus we show that adults’ communicative behavior can be described by a model that accommodates informativity in context, beyond the set of possible entities in common ground.  This study suggests that full-blown natural speech may result from speakers who model and adapt to the listener’s needs.

@@ -1,2 +1,0 @@
-run	-1	'Willow is running on port 5999'
-log	0	u"('stimNo', 'verb', 'sentence', 'trialVersion', 'prepSentence', 'exposePicture', 'actionPicture', 'word1', 'word2', 'mistakeFlag', 'responseTime')"
