@@ -88,11 +88,11 @@ mydata[is.na(mydata$HasWillow),]$WorkerId
 ## And save WorkerID code lists for the future...
 
 
-#If your line doesn't have Turk, we'll give you a free pass on language, country, and video presentation
+#(If your line doesn't have Turk, we'll give you a free pass on language, country, and video presentation)
 mydata[is.na(mydata$HasTurk),]$Answer.English <- "yes"
 mydata[is.na(mydata$HasTurk),]$Answer.country <- "USA"
 
-#################################################################
+
 ## Recode and clean data & conditions
 
 #Check for number of legal responses given in a single session!!
@@ -109,7 +109,6 @@ names(participant.responsecount) <- c("Paycode", "gotError")
 participant.responsecount$LegalAnswers <- 12-participant.responsecount$gotError
 mydata <- merge(mydata, participant.responsecount, by=c("Paycode"), all.x=TRUE)
 
-###############################################
 ## Throw out people who took a Snazzy Potato task before!
 
 previousers <- read.csv('snazzy potato 11-20.txt', header=F)
@@ -122,10 +121,9 @@ previous <- intersect(previousers$WorkerId,thistime)
 #
 mydata$tookPreviously <- mydata$WorkerId %in% previous
 #
-mydata <- mydata[mydata$tookPreviously == FALSE,]
 
 
-#################################################################
+
 ## Drop for analysis
 #(Remember, Willow-onliers got a free pass on the first 3 here...)
 
@@ -135,6 +133,7 @@ length(unique(mydata$Paycode))
 
 unique(mydata$WorkerId)
 
+mydata <- mydata[mydata$tookPreviously == FALSE,]
 mydata <- mydata[mydata$Answer.country == "USA" &
 		mydata$Answer.English == "yes" &
 		mydata$VideoProblem == "FALSE" &
@@ -155,23 +154,40 @@ length(unique(mydata$Paycode)) #91
 #Code variables
 #######
 
+#Since last time, I have re-coded some elements that were previously marked as other/vague which
+#actually DO disambiguate an element in a particular context (e.g. 'woman swing' when there is just
+#one female possible in the context display). I marked the kinds of these (nearly all previously
+#marked as 'other', except for a (very) small number of coding mistakes discovered) to allow for
+#clearer reporting.  The possible codes for each are listed in the coding doc in this folder.
+
+table(mydata$word1_CODED_PRAGMATIC)
+table(mydata$word2_CODED_PRAGMATIC)
+
+#How many helpful answers did we initially miss?
+nrow(mydata[mydata$word1_CODED != 'AGENT' & mydata$word1_CODED_PRAGMATIC == 'AGENT',])
+nrow(mydata[mydata$word1_CODED != 'OBJECT' & mydata$word1_CODED_PRAGMATIC == 'OBJECT',])
+nrow(mydata[mydata$word2_CODED != 'AGENT' & mydata$word2_CODED_PRAGMATIC == 'AGENT',])
+nrow(mydata[mydata$word2_CODED != 'OBJECT' & mydata$word2_CODED_PRAGMATIC == 'OBJECT',])
+#Thirteen! (out of 1092)
+
+
 #Code whether each argument is included in the answer!
-git
+
 mydata$mentionSubject <- FALSE
-mydata[mydata$word1_CODED == 'AGENT',]$mentionSubject <- TRUE
-mydata[mydata$word2_CODED == 'AGENT',]$mentionSubject <- TRUE
+mydata[mydata$word1_CODED_PRAGMATIC == 'AGENT',]$mentionSubject <- TRUE
+mydata[mydata$word2_CODED_PRAGMATIC == 'AGENT',]$mentionSubject <- TRUE
 
 mydata$mentionVerb <- FALSE
-mydata[mydata$word1_CODED == 'VERB',]$mentionVerb <- TRUE
-mydata[mydata$word2_CODED == 'VERB',]$mentionVerb <- TRUE
+mydata[mydata$word1_CODED_PRAGMATIC == 'VERB',]$mentionVerb <- TRUE
+mydata[mydata$word2_CODED_PRAGMATIC == 'VERB',]$mentionVerb <- TRUE
 
 mydata$mentionObject <- FALSE
-mydata[mydata$word1_CODED == 'OBJECT',]$mentionObject <- TRUE
-mydata[mydata$word2_CODED == 'OBJECT',]$mentionObject <- TRUE
+mydata[mydata$word1_CODED_PRAGMATIC == 'OBJECT',]$mentionObject <- TRUE
+mydata[mydata$word2_CODED_PRAGMATIC == 'OBJECT',]$mentionObject <- TRUE
 
 mydata$mentionOther <- FALSE
-mydata[mydata$word1_CODED == 'OTHER',]$mentionOther <- TRUE
-mydata[mydata$word2_CODED == 'OTHER',]$mentionOther <- TRUE
+mydata[mydata$word1_CODED_PRAGMATIC != 'AGENT' & mydata$word1_CODED_PRAGMATIC != 'OBJECT' & mydata$word1_CODED_PRAGMATIC != 'VERB',]$mentionOther <- TRUE
+mydata[mydata$word2_CODED_PRAGMATIC != 'AGENT' & mydata$word2_CODED_PRAGMATIC != 'OBJECT' & mydata$word2_CODED_PRAGMATIC != 'VERB',]$mentionOther <- TRUE
 
 
 #Code whether the exact SV or VO solution was reached

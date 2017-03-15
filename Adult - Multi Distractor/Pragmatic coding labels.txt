@@ -1,0 +1,25 @@
+Labels for the new ‘pragmatic’ coding of responses in the SDA experiment. 
+
+11TOCODE - not yet classified
+
+OBJECT - from the speakers perspective (given exact condition [6:1]…[1:6]) the label is a unique reference to object.  (e.g. ‘it’ when there is only one object)
+
+AGENT - from the speakers perspective (given exact condition [6:1]…[1:6]) the label is a unique reference to agent. (‘her’ when there is only one female in the set.)
+
+VERB - its the verb 
+
+VAGUE-O - this is a clear reference to the object by some label (pronoun, more general category, weird descriptor), but not a unique referent.
+
+VAGUE-A - this is a clear reference to the object by some label (pronoun, more general category, weird descriptor), but not a unique referent.
+
+VAGUE-VAGUE - We can’t tell what you mean (Agent/patient), or it’s a description that folds in multiple parts (e.g. hungry)
+
+WRONG-O, -A, -V: You have entered a different verb or descriptor (noun or adj) that doesn’t describe the target event, e.g.
+
+‘group beverages’
+
+(This person thinks they are describing the context pictures themselves?) 
+
+CHEAT - You are trying to cheat (‘ronpushes thedog’ is 2 words by the string-matcher, but you are not doing the task)
+
+TYPO-A -O -V I think you made a typo (pick for kick)  probably will be counted as wrong-v
