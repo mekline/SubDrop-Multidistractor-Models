@@ -12,7 +12,7 @@ library(bootstrap)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-source("tedlab-misc.R")
+source("lab-misc.R")
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
 
 turk.files <- list.files('batch')
@@ -279,13 +279,10 @@ with(mentionVerb, tapply(mentionVerb, list(trialVersion), mean, na.rm=TRUE), dro
 with(mentionSV, tapply(mentionSV, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 with(mentionVO, tapply(mentionVO, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 
-with(mentionSV, tapply(mentionSV, list(trialVersion), my.sd), drop=TRUE)
-with(mentionVO, tapply(mentionVO, list(trialVersion), my.sd), drop=TRUE)
-
 ########
 # Right here, calculate empirical percentages in a random split-half, for the modeling comparisons
 
-set.seed(223344)
+set.seed(223344) #to reproduce the exact values reported in the paper
 mydata$randomHalf <- runif(nrow(mydata),0,1) > 0.5
 r1 <- mydata[mydata$randomHalf,]
 r2 <- mydata[!(mydata$randomHalf),]
@@ -296,6 +293,7 @@ aggregate(r1$mentionVerb, by = list(r1$trialVersion), mean)
 aggregate(r2$mentionSubject, by = list(r2$trialVersion), mean)
 aggregate(r2$mentionObject, by = list(r2$trialVersion), mean)
 aggregate(r2$mentionVerb, by = list(r2$trialVersion), mean)
+
 
 ################################################
 
@@ -317,11 +315,11 @@ mydata$verb <- as.factor(mydata$verb)
 #We can test a few different outcome measures, e.g., whether Subject was mentioned
 
 #The nsubj manipulation is within-subject AND within-item, so the full random slopes model is:
-full_maximal_model <- lmer(mentionSubject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+full_maximal_model <- glmer(mentionSubject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 #summary(full_maximal_model)
 
 #Comparison model with just random slopes:
-random_slope_model <- lmer(mentionSubject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+random_slope_model <- glmer(mentionSubject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 
 #Likelihood ratio test:
 anova(full_maximal_model, random_slope_model)
@@ -329,9 +327,9 @@ anova(full_maximal_model, random_slope_model)
 #######
 #Or ask whether object was mentioned
 
-full_maximal_model <- lmer(mentionObject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+full_maximal_model <- glmer(mentionObject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 #summary(full_maximal_model)
-random_slope_model <- lmer(mentionObject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+random_slope_model <- glmer(mentionObject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 anova(full_maximal_model, random_slope_model)
 
 
