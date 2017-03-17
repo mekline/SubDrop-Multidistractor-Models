@@ -92,7 +92,8 @@ condition = {};
 probs = [];
 
 for i=1:6 
-    %Choose a context with 7 total participants
+    %Choose a random 'context' with 7 total participants of the right
+    %distribution
     contextS = agents(1:i);
     contextO = patients(1:(7-i));
     contextV = verbs;
