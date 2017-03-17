@@ -1,5 +1,5 @@
 ###############################################################
-## Library for tedlab -- miscellaneous functions
+## Library for XXXXXXX -- miscellaneous functions
 ## October 2009
 ###############################################################
 
