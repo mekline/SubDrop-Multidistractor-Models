@@ -17,7 +17,6 @@ mean.na.rm <- function(x) { mean(x,na.rm=T) }
 
 turk.files <- list.files('batch')
 willow.files <- list.files('log')
-#verb.files <- list.files('ratings')
 		
 ###############################################################
 ## Read in the data files from turk
@@ -287,14 +286,15 @@ mydata$randomHalf <- runif(nrow(mydata),0,1) > 0.5
 r1 <- mydata[mydata$randomHalf,]
 r2 <- mydata[!(mydata$randomHalf),]
 
-aggregate(r1$mentionSubject, by = list(r1$trialVersion), mean)
-aggregate(r1$mentionObject, by = list(r1$trialVersion), mean)
-aggregate(r1$mentionVerb, by = list(r1$trialVersion), mean)
-aggregate(r2$mentionSubject, by = list(r2$trialVersion), mean)
-aggregate(r2$mentionObject, by = list(r2$trialVersion), mean)
-aggregate(r2$mentionVerb, by = list(r2$trialVersion), mean)
+splithalf <- cbind(aggregate(r1$mentionSubject, by = list(r1$trialVersion), mean), half = 'r1', element = 'S')
+splithalf <- rbind(splithalf, cbind(aggregate(r1$mentionObject, by = list(r1$trialVersion), mean), half = 'r1', element = 'O'))
+splithalf <- rbind(splithalf, cbind(aggregate(r1$mentionVerb, by = list(r1$trialVersion), mean),half = 'r1', element = 'V'))
+splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionSubject, by = list(r2$trialVersion), mean), half = 'r2', element = 'S'))
+splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionObject, by = list(r2$trialVersion), mean),half = 'r2', element = 'O'))
+splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionVerb, by = list(r2$trialVersion), mean),half = 'r2', element = 'V'))
+names(splithalf) <- c('condition', 'p_include', 'half','element')
 
-
+write.csv(splithalf, 'humandata.csv')
 ################################################
 
 #######
