@@ -34,52 +34,22 @@ function probs = mainFun(whichModel, myEmpirical)
 
 
 %PRELIMINARIES
-% Get empirical baserates!
+% Get empirical baserates of each 2 word solution
 
-humans = readtable('Human_split_Data.csv');
-empiricalA = [mean(humans.pInclude(1:6)), mean(humans.pInclude(7:12)), mean(humans.pInclude(13:18))];
-empiricalB = [mean(humans.pInclude(19:24)), mean(humans.pInclude(25:30)), mean(humans.pInclude(31:36))];
+humans = readtable('humandata.csv');
+empiricalA = [mean(humans.p_include(1:6)), mean(humans.p_include(7:12)), mean(humans.p_include(13:18))];
+empiricalB = [mean(humans.p_include(19:24)), mean(humans.p_include(25:30)), mean(humans.p_include(31:36))];
 
-if (strmatch(myEmpirical, 'A'))
-    empirical = empiricalA 
+if myEmpirical == 'A'
+    empirical = empiricalA;
 else
-        empirical = empiricalB
-end
-%Scale those so they add to 2 (normalizing out the small % of non-SOV words
-%that humans produce); this gives p(word is included in 2 word phrase). 
-empirical = 2*empirical/sum(empirical);
-
-verbParam = 5; %For now, setting this to a random value. Later it will be
-%empirically fit to the data (?)
-
-
-%EmpiricalA/B represent 2 draws without replacement from a weighted system.
-%Let's try and get approximate numerical solutions for the weights!
-
-
-syms pS pO pV
-S = vpasolve([empirical(1) == pS + pV*(pS/(1-pV)) + pO*(pS/(1-pO)), ... 
-    empirical(2) == pO + pS*(pO/(1-pS)) + pV*(pO/(1-pV)), ...
-    empirical(3) == pV + pS*(pV/(1-pS)) + pO*(pV/(1-pO))], ...
-    [pS, pO, pV]);
-
-%Happily in both cases the above has a single soln with all reasonable 
-%probability distributions :)
-
-if (strmatch(myEmpirical, 'A'))
-    pS = S.pS(4);
-    pO = S.pO(4);
-    pV = S.pV(4);
-    
-else
-    pS = S.pS(5);
-    pO = S.pO(5);
-    pV = S.pV(5);
+    empirical = empiricalB;
 end
 
-% A full context (from which individual contexts can be selected) with
-%dummy values; we'll cycle through these to evaluate individual predictions
+verbParam = 5; %For now, setting this to a random value. It could also be
+%empirically fit to the data
 
+%The possible context members, with dummy values
 agents = {'Amy','George','Alvin','Luke','Leia','Vader'};
 patients = {'apple','pear','mango','durian','peach','plum'};
 verbs = {};
@@ -99,52 +69,67 @@ for i=1:6
     contextV = verbs;
     
     switch whichModel
-        case 'dummy' %Just emits 2 words at p(baseline)
-            [includeS, includeO, includeV] = get2([pS,pO,pV]);
-            probs = [probs; includeS, includeO, includeV]; %Sanity check! This should give back the empirical observations, and they do.
+        case 'dummycost' %Just emits 2 words at p(baseline)
+            probs = [probs; empirical];
             
-        case 'succeedorfail' %Try both combinations! (unordered, always includes V)
-            includeV = 1;
+        case 'succeedorfail' %Always include V, include S or O if it's uniquely informative, otherwise at baserate
+            includeSV = empirical(1);
+            includeVO = empirical(2);
+            includeSO = 0;
             
             %SV works?
             succeedS = length(contextO) == 1;
             %VO words?
             succeedO = length(contextS) == 1;
             
-            %Normalize baserates to S and O
-            includeS = empirical(1)/(empirical(1) + empirical(2));
-            includeO = empirical(2)/(empirical(1) + empirical(2));
-            
-            if (not(succeedS + succeedO == 0)) %There is a successful solution! Renormalize
-                pSV = includeS*succeedS;
-                pVO = includeO*succeedO;
+            if (not(succeedS + succeedO == 0)) %There is actually a successful solution! Renormalize
+                includeSV = includeSV*succeedS;
+                includeVO = includeVO*succeedO;
                 
-                includeS = pSV/(pSV+pVO);
-                includeO = pVO/(pSV+pVO);
             end
             
-            probs = [probs; includeS, includeO, includeV];
+            normedval = [includeSV, includeVO, includeSO]/sum([includeSV, includeVO, includeSO])
+            probs = [probs; normedval];
+            
+        case 'succeedorfail_nobase'
+            %The same, but without even a base rate!
+            includeSV = 0.5;
+            includeVO = 0.5;
+            includeSO = 0;
+            
+            %SV works?
+            succeedS = length(contextO) == 1;
+            %VO words?
+            succeedO = length(contextS) == 1;
+            
+            if (not(succeedS + succeedO == 0)) %There is actually a successful solution! Renormalize
+                includeSV = includeSV*succeedS;
+                includeVO = includeVO*succeedO;
+                
+            end
+            
+            normedval = [includeSV, includeVO, includeSO]/sum([includeSV, includeVO, includeSO])
+            probs = [probs; normedval];
             
         case 'informative_nobaserate'
             
-            p = modelInformativeWord(contextS, contextO, contextV);
-       
-            %But actually, we produce two words! They are sampled without
-            %replacement according to those probabilities. 
-            [includeS, includeO, includeV] = get2(p);
-            probs = [probs; includeS, includeO, includeV];
+            %This yields the probability of producing [SV, VO, SO].  For
+            %this evaulation, recalc to reflect whether utt includes each
+            %word. 
+            
+            p = modelInformativeUtt(contextS, contextO, contextV);
+            
+            probs = [probs; p];
 
         case 'informative_baserate'
             %Same as above! But we scale the probability of mentioning
             %subject/object by the general tendency to include that
             %word in an utterance.
             
-            p = modelInformativeWord(contextS, contextO, contextV);
-            [includeS, includeO, includeV] = get2(p);
+            p = modelInformativeUtt(contextS, contextO, contextV);
             
-             
-            scaledInclude = [includeS, includeO, includeV] + empirical; 
-            scaledInclude = 2*scaledInclude/sum(scaledInclude);
+            rsac = p .* empirical; 
+            scaledInclude = normr(rsac);
             probs = [probs; scaledInclude];
             
             
@@ -153,7 +138,7 @@ for i=1:6
 end
 
 
-csvwrite(['Model_' whichModel myEmpirical '.csv'], probs);
+csvwrite([whichModel myEmpirical '.csv'], probs);
 
 end
 

@@ -16,7 +16,7 @@ source("lab-misc.R")
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
 
 turk.files <- list.files('batch')
-willow.files <- list.files('log')
+willow.files <- list('2012-11-21-10-32-35CODED_2016.csv')
 		
 ###############################################################
 ## Read in the data files from turk
@@ -154,7 +154,7 @@ length(unique(mydata$Paycode)) #91
 #######
 
 #Since last time, I have re-coded some elements that were previously marked as other/vague which
-#actually DO disambiguate an element in a particular context (e.g. 'woman swing' when there is just
+#actually DO disambiguate an element in a particular context (e.g. 'woman swing' when there is actually just
 #one female possible in the context display). I marked the kinds of these (nearly all previously
 #marked as 'other', except for a (very) small number of coding mistakes discovered) to allow for
 #clearer reporting.  The possible codes for each are listed in the coding doc in this folder.
@@ -167,6 +167,7 @@ nrow(mydata[mydata$word1_CODED != 'AGENT' & mydata$word1_CODED_PRAGMATIC == 'AGE
 nrow(mydata[mydata$word1_CODED != 'OBJECT' & mydata$word1_CODED_PRAGMATIC == 'OBJECT',])
 nrow(mydata[mydata$word2_CODED != 'AGENT' & mydata$word2_CODED_PRAGMATIC == 'AGENT',])
 nrow(mydata[mydata$word2_CODED != 'OBJECT' & mydata$word2_CODED_PRAGMATIC == 'OBJECT',])
+nrow(mydata)
 #Thirteen! (out of 1092)
 
 
@@ -196,6 +197,9 @@ mydata[mydata$mentionSubject == TRUE & mydata$mentionVerb == TRUE,]$mentionSV <-
 mydata$mentionVO <- FALSE
 mydata[mydata$mentionObject == TRUE & mydata$mentionVerb == TRUE,]$mentionVO <- TRUE
 
+mydata$mentionSO <- FALSE
+mydata[mydata$mentionObject == TRUE & mydata$mentionSubject == TRUE,]$mentionSO <- TRUE
+
 
 ################################################
 
@@ -205,7 +209,8 @@ mydata[mydata$mentionObject == TRUE & mydata$mentionVerb == TRUE,]$mentionVO <- 
 
 #How often did people go off piste with response?
 mean(mydata$mentionOther)
-
+nrow(mydata[(mentionSubject == FALSE & mentionObject == FALSE & mentionVerb == FALSE),])
+nrow(mydata)
 
 #Look at overall results
 with(mydata, tapply(mentionSubject, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
@@ -282,16 +287,17 @@ with(mentionVO, tapply(mentionVO, list(trialVersion), mean, na.rm=TRUE), drop=TR
 # Right here, calculate empirical percentages in a random split-half, for the modeling comparisons
 
 set.seed(223344) #to reproduce the exact values reported in the paper
-mydata$randomHalf <- runif(nrow(mydata),0,1) > 0.5
-r1 <- mydata[mydata$randomHalf,]
-r2 <- mydata[!(mydata$randomHalf),]
+cleandata <- filter(mydata, mentionOther == 0)
+cleandata$randomHalf <- runif(nrow(cleandata),0,1) > 0.5
+r1 <- filter(cleandata, randomHalf)
+r2 <- filter(cleandata, !(randomHalf))
 
-splithalf <- cbind(aggregate(r1$mentionSubject, by = list(r1$trialVersion), mean), half = 'r1', element = 'S')
-splithalf <- rbind(splithalf, cbind(aggregate(r1$mentionObject, by = list(r1$trialVersion), mean), half = 'r1', element = 'O'))
-splithalf <- rbind(splithalf, cbind(aggregate(r1$mentionVerb, by = list(r1$trialVersion), mean),half = 'r1', element = 'V'))
-splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionSubject, by = list(r2$trialVersion), mean), half = 'r2', element = 'S'))
-splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionObject, by = list(r2$trialVersion), mean),half = 'r2', element = 'O'))
-splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionVerb, by = list(r2$trialVersion), mean),half = 'r2', element = 'V'))
+splithalf <- cbind(aggregate(r1$mentionSV, by = list(r1$trialVersion), mean), half = 'r1', element = 'SV')
+splithalf <- rbind(splithalf, cbind(aggregate(r1$mentionVO, by = list(r1$trialVersion), mean), half = 'r1', element = 'VO'))
+splithalf <- rbind(splithalf, cbind(aggregate(r1$mentionSO, by = list(r1$trialVersion), mean),half = 'r1', element = 'SO'))
+splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionSV, by = list(r2$trialVersion), mean), half = 'r2', element = 'SV'))
+splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionVO, by = list(r2$trialVersion), mean),half = 'r2', element = 'VO'))
+splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionSO, by = list(r2$trialVersion), mean),half = 'r2', element = 'SO'))
 names(splithalf) <- c('condition', 'p_include', 'half','element')
 
 write.csv(splithalf, 'humandata.csv')
@@ -308,8 +314,8 @@ mydata$nSubj <- as.numeric(mydata$trialVersion) #This works because trialVersion
 mydata$paycode <- as.factor(mydata$paycode)
 mydata$verb <- as.factor(mydata$verb)
 
-#Here's a good important test!  Try taking out the extreme levels of nSubj to see if everything below holds on non-deterministic cases!!!!
-#mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
+#To get the other set of analyses reported for human data: taking out the extreme levels of nSubj to see if everything below holds on non-deterministic cases!!!!
+mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
 
 #######
 #We can test a few different outcome measures, e.g., whether Subject was mentioned
@@ -343,8 +349,8 @@ mean(mydata$mentionObject)
 
 #Test the distribution of answers that mentioned JUST ONE of those two
 mydata$Only <- "Neither"
-mydata[(mydata$word1_CODED == "AGENT" | mydata$word2_CODED == "AGENT") & !(mydata$word1_CODED == "OBJECT" | mydata$word2_CODED == "OBJECT"),]$Only <- "SubOnly"
-mydata[!(mydata$word1_CODED == "AGENT" | mydata$word2_CODED == "AGENT") & (mydata$word1_CODED == "OBJECT" | mydata$word2_CODED == "OBJECT"),]$Only <- "SubOnly"
+mydata[(mydata$mentionSubject == TRUE & mydata$mentionObject == FALSE),]$Only <- "SubOnly"
+mydata[(mydata$mentionSubject == FALSE & mydata$mentionObject == TRUE),]$Only <- "ObOnly"
 
 #How many had both?
 mean(mydata$Only == "Neither")
@@ -411,9 +417,9 @@ ggplot(data=mylong, aes(x=condLabel, y=mentionMean, fill=trialLabel)) +
   xlab('') +
   ylab('proportion of trials mentioning word') +
   scale_fill_manual(name="", values=my.cols) +
-  theme(legend.key = element_blank()) +
   theme_bw() +
   theme(strip.background = element_blank()) +
+  theme(legend.key = element_blank()) +
   theme(text = element_text(family="Times", size=rel(4))) +
   theme(legend.text = element_text(family="Times", size=rel(4))) +
   theme(axis.text = element_text(family="Times", size=rel(0.9)))
