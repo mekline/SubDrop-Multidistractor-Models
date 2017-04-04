@@ -192,5 +192,5 @@ ggplot(data=toGraph, aes(x=human, y=modelprob)) +
   theme(axis.text = element_text(family="Times", size=rel(0.9))) +
   theme(strip.text = element_text(family="Times", size=rel(0.9))) 
 
-ggsave(filename="fitlines.jpg", width=12, height=4)
+ggsave(filename="fitlines.jpg", width=9, height=3)
 
