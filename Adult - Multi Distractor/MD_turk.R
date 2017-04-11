@@ -2,7 +2,10 @@
 ## Analysis of multi-distractor 'SubDrop' experiment
 ###############################################################
 
-#setwd(mydir)
+#To run somewhere other than MK's laptop
+#setwd(mydir) <- your directory here
+
+#Necessary packages
 
 library(languageR)
 library(lme4)
@@ -15,8 +18,8 @@ library(ggplot2)
 source("lab-misc.R")
 mean.na.rm <- function(x) { mean(x,na.rm=T) }
 
-turk.files <- list.files('batch')
-willow.files <- list('2012-11-21-10-32-35CODED_2016.csv')
+turk.files <- list.files('batch') #Mturk files (participant data)
+willow.files <- list('2012-11-21-10-32-35CODED_2016.csv') #(trial data)
 		
 ###############################################################
 ## Read in the data files from turk
@@ -53,8 +56,7 @@ willowdata$Paycode <- willowdata$paycode
 
 #How many do we start with?
 length(unique(willowdata$Paycode)) #112
-#length(unique(verbdata$Paycode)) #102
-length(unique(turkdata$WorkerId)) #100
+length(unique(turkdata$WorkerId)) #100 #(These differ bc a few people enter the willow survey but don't go on to submit to MTurk)
 
 #Save and standardize
 turkdata$Paycode <- turkdata$Answer.payCode
@@ -65,15 +67,7 @@ willowdata$HasWillow <- TRUE
 
 mydata <- NULL
 mydata <- merge(willowdata, turkdata, by=c("Paycode"), all.x=TRUE, all.y=TRUE)
-#mydata <- merge(mydata, verbdata, by=c("Paycode", "stimNo", "paycode", "verb"), all.x=TRUE, all.y=TRUE)
-
-#If your line doesn't have Willow, you are a useless unmatched Turk entry!
-
-#Check who these jokers are!  Will want to make double sure they have not taken the survey twice...
-mydata[is.na(mydata$HasWillow),]$Paycode
-mydata[is.na(mydata$HasWillow),]$WorkerId
-
-
+#If your line didn't have Willow, you tried submitting without actually accessing the survey...
 
 
 #################################################################
@@ -87,7 +81,7 @@ mydata[is.na(mydata$HasWillow),]$WorkerId
 ## And save WorkerID code lists for the future...
 
 
-#(If your line doesn't have Turk, we'll give you a free pass on language, country, and video presentation)
+#(A few participants didn't have turk data, assume they are fine for language, country, and video presentation)
 mydata[is.na(mydata$HasTurk),]$Answer.English <- "yes"
 mydata[is.na(mydata$HasTurk),]$Answer.country <- "USA"
 
@@ -95,7 +89,7 @@ mydata[is.na(mydata$HasTurk),]$Answer.country <- "USA"
 ## Recode and clean data & conditions
 
 #Check for number of legal responses given in a single session!!
-#mistakeFlag - on your first attempt, you put more than 1 word in a text box and were told to correct it. We exclude these.
+#mistakeFlag - on your first attempt, you put more than 1 word in a text box and were told to correct it. We exclude those trials.
 mydata[is.na(mydata$mistakeFlag),]$mistakeFlag <- 'bad input'
 mydata[mydata$mistakeFlag == '',]$mistakeFlag <- 'bad input' #Fix up missing values
 
@@ -115,13 +109,8 @@ names(previousers) <- c("WorkerId")
 thistime <- unique(mydata$WorkerId)
 previous <- intersect(previousers$WorkerId,thistime)
 #
-##Grr!  Go make sure to not pay those guys!....
-#
-#
 mydata$tookPreviously <- mydata$WorkerId %in% previous
 #
-
-
 
 ## Drop for analysis
 #(Remember, Willow-onliers got a free pass on the first 3 here...)
@@ -146,18 +135,18 @@ length(unique(mydata$Paycode)) #91
 
 
 #################################################################
-## Time to analyze the data!
+## DATA ANALYSIS BEGINS HERE!
 
 
 #######
 #Code variables
 #######
 
-#Since last time, I have re-coded some elements that were previously marked as other/vague which
+#Since last time, I have re-coded some elements that were previously marked as 'other/vague' which
 #actually DO disambiguate an element in a particular context (e.g. 'woman swing' when there is actually just
-#one female possible in the context display). I marked the kinds of these (nearly all previously
-#marked as 'other', except for a (very) small number of coding mistakes discovered) to allow for
-#clearer reporting.  The possible codes for each are listed in the coding doc in this folder.
+#one female possible in the context display). I marked these as well as splitting the 'other' category
+#into a few types (e.g. gave a superordinate description that's ambiguous, gave a definitely wrong desription)
+#The possible codes are listed 'the coding doc in the folder 'Pragmatic coding labels.txt'.
 
 table(mydata$word1_CODED_PRAGMATIC)
 table(mydata$word2_CODED_PRAGMATIC)
@@ -167,12 +156,15 @@ nrow(mydata[mydata$word1_CODED != 'AGENT' & mydata$word1_CODED_PRAGMATIC == 'AGE
 nrow(mydata[mydata$word1_CODED != 'OBJECT' & mydata$word1_CODED_PRAGMATIC == 'OBJECT',])
 nrow(mydata[mydata$word2_CODED != 'AGENT' & mydata$word2_CODED_PRAGMATIC == 'AGENT',])
 nrow(mydata[mydata$word2_CODED != 'OBJECT' & mydata$word2_CODED_PRAGMATIC == 'OBJECT',])
+nrow(mydata[mydata$word1_CODED != 'VERB' & mydata$word1_CODED_PRAGMATIC == 'VERB',])
+nrow(mydata[mydata$word2_CODED != 'VERB' & mydata$word2_CODED_PRAGMATIC == 'VERB',])
 nrow(mydata)
 #Thirteen! (out of 1092)
 
+#Now, recode whole responses from properties of the 2 words (this is how we report human
+#data since ppl. often gave just 1 'codable' word)
 
-#Code whether each argument is included in the answer!
-
+#Code whether each argument is included in the answer
 mydata$mentionSubject <- FALSE
 mydata[mydata$word1_CODED_PRAGMATIC == 'AGENT',]$mentionSubject <- TRUE
 mydata[mydata$word2_CODED_PRAGMATIC == 'AGENT',]$mentionSubject <- TRUE
@@ -204,13 +196,16 @@ mydata[mydata$mentionObject == TRUE & mydata$mentionSubject == TRUE,]$mentionSO 
 ################################################
 
 #######
-#Descriptives
+#DESCRIPTIVE STATISTICS
 #######
 
-#How often did people go off piste with response?
+################################################
+
+
+#How often did people include some non AVP word?
 mean(mydata$mentionOther)
-nrow(mydata[(mentionSubject == FALSE & mentionObject == FALSE & mentionVerb == FALSE),])
-nrow(mydata)
+#...or include NO AVP words?
+nrow(mydata[(mentionSubject == FALSE & mentionObject == FALSE & mentionVerb == FALSE),])/nrow(mydata)
 
 #Look at overall results
 with(mydata, tapply(mentionSubject, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
@@ -218,7 +213,7 @@ with(mydata, tapply(mentionObject, list(trialVersion), mean, na.rm=TRUE), drop=T
 with(mydata, tapply(mentionVerb, list(trialVersion), mean, na.rm=TRUE), drop=TRUE)
 
 #Get some bootstrapped confidence intervals for these numbers
-#TERRIBLE CODE ALERT there is definitely some better way to do this. 
+#TERRIBLE CODE ALERT there is a better way to do this. 
 mentionSb_1.boot.mean = bootstrap(mydata[mydata$trialVersion=="1_6",]$mentionSubject, 1000, mean)
 quantile(mentionSb_1.boot.mean$thetastar, c(0.025, 0.975))
 mentionSb_2.boot.mean = bootstrap(mydata[mydata$trialVersion=="2_5",]$mentionSubject, 1000, mean)
@@ -260,7 +255,7 @@ quantile(mentionVb_6.boot.mean$thetastar, c(0.025, 0.975))
 
 
 ########
-#Lump by subject to get frequency scores! Just for fun There are 2 trials per version (1_6, etc)
+#Lump by subject to get frequency scores (for ppl who like to see them thatway) There are 2 trials per version (1_6, etc)
 
 mentionSubject <- aggregate(mydata$mentionSubject, by = list(mydata$Paycode, mydata$trialVersion), sum)
 names(mentionSubject) <- c("Paycode", "trialVersion", "mentionSubject")
@@ -301,28 +296,39 @@ splithalf <- rbind(splithalf, cbind(aggregate(r2$mentionSO, by = list(r2$trialVe
 names(splithalf) <- c('condition', 'p_include', 'half','element')
 
 write.csv(splithalf, 'humandata.csv')
+
+
+################################################
+#INFERENTIAL STATISTICS
 ################################################
 
-#######
-#Run models!!
-#######
 
-#Make a variable for the inputs - number of subjects
+#Recode variable (numeric/interval) for the inputs - number of subjects
 mydata$nSubj <- as.numeric(mydata$trialVersion) #This works because trialVersion is coded as 6_1 (6 sub 1 ob), 5_2 (5sub 2 ob) etc.
 
 #Make sure that item and subject codings are factors...
 mydata$paycode <- as.factor(mydata$paycode)
 mydata$verb <- as.factor(mydata$verb)
 
-#To get the other set of analyses reported for human data: taking out the extreme levels of nSubj to see if everything below holds on non-deterministic cases!!!!
-mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
+#To get the second set of analyses reported for human data: taking out the extreme levels of nSubj to see if everything below holds on non-deterministic cases!!!!
+#mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
+
+#From a reviewer suggestion: In our main analysis, we coded nSubj as numeric/interval.
+#Ordinal coding might be more correct, and stats can be examined by uncommenting the line below
+#mydata$nSubj <- ordered(mydata$nSubj)
+
+#In brief, this yields equivalent results for both mentionObject and mentionSubject tests with all 
+#levels, as well as equivalent results for mentionSubject with just intermediate levels (see line 318),
+#but the model for mentionObject fails to converge even with just a single random intercept. In the 
+#interval-coding version, this model is only weakly significantly better than the control model, so we 
+#should moderate our confidence in that conclusion carefully. 
 
 #######
-#We can test a few different outcome measures, e.g., whether Subject was mentioned
+#We test two (nonindependent) different outcome measures, i.e. whether Subject was mentioned
 
 #The nsubj manipulation is within-subject AND within-item, so the full random slopes model is:
 full_maximal_model <- glmer(mentionSubject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
-#summary(full_maximal_model)
+#(slow to converge)
 
 #Comparison model with just random slopes:
 random_slope_model <- glmer(mentionSubject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
@@ -330,14 +336,26 @@ random_slope_model <- glmer(mentionSubject ~1 + (nSubj|paycode) +(nSubj|verb), d
 #Likelihood ratio test:
 anova(full_maximal_model, random_slope_model)
 
-#######
-#Or ask whether object was mentioned
+#For ordinal factors, it didn't converge.  Dropped verb random slopes first, then subject random slopes
+#notfull_maximal_model <- glmer(mentionSubject ~1 nSubj + (1|paycode) +(1|verb), data=mydata, family="binomial")
+#notfullrandom_slope_model <- glmer(mentionSubject ~1 + (1|paycode) +(1|verb), data=mydata, family="binomial")
 
+#Likelihood ratio test (ordinal factors)
+#anova(notfull_maximal_model, notfullrandom_slope_model)
+
+#######
+#...Or ask whether object was mentioned
+
+#Use with numeric coding
 full_maximal_model <- glmer(mentionObject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
-#summary(full_maximal_model)
+
 random_slope_model <- glmer(mentionObject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 anova(full_maximal_model, random_slope_model)
 
+#Use with ordinal coding, full dataset (doesn't converge with slopes) Note, this fails on middle-level data, which fails to converge in all cases
+#notfull_maximal_model <- glmer(mentionObject ~ nSubj + (1|paycode) +(1|verb), data=mydata, family="binomial")
+#notfullrandom_slope_model <- glmer(mentionObject ~1 + (1|paycode) +(1|verb), data=mydata, family="binomial")
+#anova(notfull_maximal_model, notfullrandom_slope_model)
 
 
 ##################################
@@ -361,9 +379,14 @@ diffdata$wasOb <- diffdata$Only == "ObOnly"
 #Test!
 binom.test(sum(diffdata$wasOb), nrow(diffdata))
 
+
+########################################
+
 ###############
 # GRAPHS
 ###############
+
+########################################
 
 #Reorganize the data
 mylong <- mydata %>% 
@@ -436,7 +459,7 @@ ggsave(filename="humanPerformance.jpg", width=10, height=6)
 
 
 
-##### Extra analyses
+##### Extra/exploratory analyses
 ##################################3
 
 #######
@@ -454,24 +477,4 @@ random_slope_model <- lmer(mentionVO ~1 + (nSubj|paycode) +(nSubj|verb), data=my
 anova(full_maximal_model, random_slope_model)
 
 
-
-#We looked at verb surprisals, but they weren't very informative. (We jsut asked people how surprising the verb was given the agent & patient sets, e.g. THROW fruit vs. EAT fruit)
-
-#First look at the data - for each verb, how often included? what average surprisal?
-
-surprisal <- aggregate(mydata$surpriseRating, by = list(mydata$verb), mean.na.rm)
-names(surprisal) <- c("verb", "surprisal")
-
-marginalVerbMention <- aggregate(mydata$mentionVerb, by = list(mydata$verb), mean.na.rm)
-names(marginalVerbMention) <- c("verb", "mention")
-
-surpriseMatrix <- merge(surprisal, marginalVerbMention, by=c("verb"))
-
-#Take out an outlier...
-
-surpriseMatrix <- surpriseMatrix[surpriseMatrix$surprisal < 2,]
-
-z <- lm(mention ~ surprisal, data = surpriseMatrix)
-plot(surpriseMatrix$surprisal, surpriseMatrix$mention)
-abline(z)
 

@@ -190,7 +190,8 @@ ggplot(data=toGraph, aes(x=human, y=modelprob)) +
   theme(text = element_text(family="Times", size=rel(4))) +
   theme(legend.text = element_text(family="Times", size=rel(4))) +
   theme(axis.text = element_text(family="Times", size=rel(0.9))) +
-  theme(strip.text = element_text(family="Times", size=rel(0.9))) 
+  theme(strip.text = element_text(family="Times", size=rel(0.9))) +
+  theme(legend.position = "bottom")
 
-ggsave(filename="fitlines.jpg", width=9, height=3)
+ggsave(filename="fitlines.jpg", width=9, height=4)
 
