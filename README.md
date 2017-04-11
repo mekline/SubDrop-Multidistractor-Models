@@ -36,9 +36,9 @@ All stimuli used for the experiment reported in this paper. We include the origi
 
 The main analysis pipeline, which starts from the raw data and produces all analyses & (human) graphs reported in Experiment 1. This file generates the following:
 
-** humandata.csv - includes just the 'normal' ({AVP} choose 2) responses, used to calculate parameters for the models
+- humandata.csv - includes just the 'normal' ({AVP} choose 2) responses, used to calculate parameters for the models
 
-** humanPerformance.jpg
+- humanPerformance.jpg
 
 * snazzy potato 11-20.txt
 
