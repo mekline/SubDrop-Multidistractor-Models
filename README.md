@@ -42,4 +42,22 @@ IDs of AMT workers who participated in a pilot version of the study and thus sho
 
 #### MODELS/
 
-bleh blah
+* humandata.csv
+
+Identical to the version in Adult - Multidistractor/, copied here for convenience
+
+* mainFun.m, modelInformativeUtt.m
+
+Two matlab scripts that instantiate the models described in the paper; outputs are saved to the (many) csv files; note that the loop produces outputs for both the A human data and B human data, but in cases where there are no data-fit parameters these wind up being identical)
+
+* CompareModelToData.R
+
+Computes all the correlations and graphs reported in the modeling section of the paper, plus some new exploratory plots of human vs. model predictions by word. This script produces all the jpgs.
+
+* CSVs: dummycost, informative_baserate, informative_nobaserate, succeedorfail, etc. 
+
+Outputs of the models, produced by mainFun.m
+
+* one word models/
+
+Contains versions of the models used earlier on; they generated predictions for 1 word productions followed by sampling 2 words w/o replacement from those likelihoods (this is much more confusing to read about than the 2 word version)
