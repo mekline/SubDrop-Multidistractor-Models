@@ -1,3 +1,0 @@
-1345058694299,paycode,itemNo,stimNo,verb,sentence,trialVersion,prepSentence,exposePicture,actionPicture,word1,word2,mistakeFlag,responseTime
-1345058721331,c3ce1945bca0,0,2,EAT,The monkey eats the orange.,patient,"In the next scene, there is a banana, a monkey and an orange.",pictures/EAT-patient-expose.jpg,pictures/EAT-patient-action.jpg,monkey,banana,none,6.37
-1345058735676,c3ce1945bca0,1,1,DRINK,The grandma drinks juice.,patient,"In the next scene, there is some milk, a grandma and some juice.",pictures/DRINK-patient-expose.jpg,pictures/DRINK-patient-action.jpg,grandma,drinks,none,6.281

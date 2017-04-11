@@ -1,6 +1,0 @@
-1345058791847,paycode,itemNo,stimNo,verb,sentence,trialVersion,prepSentence,exposePicture,actionPicture,word1,word2,mistakeFlag,responseTime
-1345058819034,i2cd41eed4d0,0,3,FEED,The girl feeds the dog.,patient,"In the next scene, there is a kitten, a girl and a dog.",pictures/FEED-patient-expose.jpg,pictures/FEED-patient-action.jpg,girl,dog,bad input,12.888
-1345058831443,i2cd41eed4d0,1,1,DRINK,The grandma drinks juice.,patient,"In the next scene, there is some milk, a grandma and some juice.",pictures/DRINK-patient-expose.jpg,pictures/DRINK-patient-action.jpg,asdfasdf,asdf,none,4.353
-1345058858746,paycode,itemNo,stimNo,verb,sentence,trialVersion,prepSentence,exposePicture,actionPicture,word1,word2,mistakeFlag,responseTime
-1345058878424,c1fe5c9b4e1,0,5,ROLL,The baby rolls the ball.,patient,"In the next scene, there is a tire, a baby and a ball.",pictures/ROLL-patient-expose.jpg,pictures/ROLL-patient-action.jpg,babty,ball,none,6.97
-1345058892816,c1fe5c9b4e1,1,6,WASH,The duck washes the bowl.,patient,"In the next scene, there is a spoon, a duck and a bowl.",pictures/WASH-patient-expose.jpg,pictures/WASH-patient-action.jpg,duck,bwol,none,6.267
