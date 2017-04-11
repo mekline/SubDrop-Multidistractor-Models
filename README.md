@@ -8,9 +8,9 @@ How do we decide what to say to ensure our meanings will be understood? The Rati
 
 ### Repository Contents
 
-####Adult - Multidistractor/
+#### Adult - Multidistractor/
 
-#####Folders
+##### Folders
 
 * batch/
 * log/
@@ -30,7 +30,7 @@ Files used during initial coding by RAs of raw responses -> category (e.g. 'dog'
 All stimuli used for the experiment reported in this paper. We include the original clip art used while generating the stimuli (objects), all context scenes (e.g. 1 person and 6 animals for the 'FEED' event, FEED_1_6.jpg), and all actions (FEED, DRINK, etc.)
 
 
-#####Files
+##### Files
 
 * MD_turk.R, lab-misc.R
 
@@ -44,4 +44,6 @@ The main analysis pipeline, which starts from the raw data and produces all anal
 
 IDs of AMT workers who participated in a pilot version of the study and thus shouldn't be included in analysis (we told them not to sign up if they had been in that experiment but some did anyway)
 
-####MODELS/
+#### MODELS/
+
+bleh blah
