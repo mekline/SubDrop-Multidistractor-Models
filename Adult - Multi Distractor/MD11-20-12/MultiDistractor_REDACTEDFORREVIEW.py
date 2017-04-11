@@ -51,8 +51,8 @@ def session(me):
 	actionPicture = []
 	
 	for i in xrange(len(items)):
-		exposePicture.append("http://REDACTED/MDPictures/" + verb[i] + "_" + trialVersion[i] + ".jpg")
-		actionPicture.append("http://REDACTED/MDPictures/" + verb[i] +".jpg")
+		exposePicture.append(“REDACTED/MDPictures/" + verb[i] + "_" + trialVersion[i] + ".jpg")
+		actionPicture.append("REDACTED/MDPictures/" + verb[i] +".jpg")
 		prepSentence.append("Get ready for the next presentation scene!")
 
 	#And intialize the lists for the response info we collect:

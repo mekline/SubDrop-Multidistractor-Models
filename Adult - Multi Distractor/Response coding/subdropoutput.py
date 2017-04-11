@@ -1,6 +1,6 @@
 import csv
-f = open("C:/Users/mekline/Documents/My Dropbox/_Projects/Message Compressions - Adult Experiments/Two-five distractors/MD - with verb ratings/2012-11-21-10-32-35.csv","r")
-w = open("C:/Users/mekline/Documents/My Dropbox/_Projects/Message Compressions - Adult Experiments/Two-five distractors/MD - with verb ratings/2012-11-21-10-32-35CODED.csv","wb")
+f = open("C:/Users/REDACTED/2012-11-21-10-32-35.csv","r")
+w = open("C:/Users/REDACTED/2012-11-21-10-32-35CODED.csv","wb")
 r = csv.DictReader(f)
 
 header = [['word1_CODED','word2_CODED']]
