@@ -152,7 +152,7 @@ ggplot(data=toGraph, aes(x=Word, y=prob, fill=trialLabel)) +
 
 ggsave(filename="allmodels_nolegend.jpg", width=11, height=8)
 
-#Why is the correlation between succeedorfail as high as it is? I suspect simpsons paradoxes
+#Why is the correlation between succeedorfail as high as it is? Melissa suspects simpsons paradoxes
 
 toGraph <- toGraph %>%
   #filter(model == 'informative_nobaserate' | model == 'human') %>%
