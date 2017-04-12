@@ -1,0 +1,89 @@
+run	-1	'Willow is running on port 4999'
+log	0	u"('paycode', 'itemNo', 'stimNo', 'verb', 'sentence', 'trialVersion', 'prepSentence', 'exposePicture', 'actionPicture', 'word1', 'word2', 'mistakeFlag', 'responseTime', 'surpriseRating', 'giveCat')"
+take	0	"{'tag': 'click', 'id': 'ConsentButton', 'client': 0}"
+add	0	'(body)\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="exp.css" />\n</head>\n<body>\n\n<h3>Consent Statement</h3>\n<p class="blocktext"> By answering the following questions, you are participating in a study being performed by cognitive scientists in the MIT Department of Brain and Cognitive Science. \nIf you have questions about this research, please contact Edward Gibson at egibson@mit.edu. Your participation in this research is voluntary. You may decline to answer any or all of the following questions. \nYou may decline further participation, at any time, without adverse consequences. Your anonymity is assured; the researchers who have requested your participation will not receive any personal information about you.</p>\n\n<br></br>\n\n<p class="blocktext"><b> This is a SNAZZY POTATO SURVEY.  Please complete only one HIT from this group.  You will not be paid for completing more than one SNAZZY POTATO survey, including those taken from previous HIT groups.</b> </p>\n\n<br></br>\n\n<p class="blocktext"> Click the \'I agree\' button below to go on to the study.</p>\n\n<br></br>\n\n<p class="blocktext"> <center>\n<input type=\'submit\' value=\'I agree\' id=\'ConsentButton\'> </center>\n</p>\n\n</body>\n</html>'
+put	0	"{u'time': 1424651713998, u'tag': u'click', u'id': u'ConsentButton', u'client': 0}"
+took	0	"{u'client': 0, u'tag': u'click', u'id': u'ConsentButton', u'time': 1424651713998}"
+take	0	"{'tag': 'click', 'id': 'InstructButton', 'client': 0}"
+let	0	'(body)'
+add	0	'(body)\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="exp.css" />\n</head>\n<body>\n\n\n<h3> Instructions</h3>\n<p class="blocktext"> In this task, you will be describing a series of cartoon scenes for another participant.  You can only send two words to your partner at a time, but you must still try to convey what is happening in each scene.  </p> \n<br></br>\n\n<p class="blocktext"> For each scene, your partner will be able to see an initial set of possible participants (the presentation scene): </p>\n\n<div>\n<img src="expose.jpg" height=200>\n</div>\n\n<br></br>\n<p class="blocktext">However, they won\'t be able to see the actual action that takes place (the action scene) or the description sentence:  </p>\n\n<div>\n<img src="action.jpg" height=200>\n</div>\n<h4>"The monkey smells the orange."</h4>\n\n<p class="blocktext">Your job is to let them know what happens in the action scene using just two of the words from the description. Again, you can use only two words to respond.  Your responses will be timed.  </p>\n<br></br>\n\n<p class="blocktext">After you give your answers for all 12 scenes, you will be asked a short followup question about each scene. </p>\n<br></br>\n\n\n<p class="blocktext"><i> This is a SNAZZY POTATO SURVEY.  Please complete only one HIT from this group.  You will not be paid for completing more than one SNAZZY POTATO survey (including surveys taken in previous HIT groups.)</i> </p>\n\n<br></br>\n\n<p class="blocktext"> Click the button below when you are ready to start viewing the pictures.</p>\n<br></br>\n\n<p class="blocktext"><center>\n<input type=\'submit\' value=\'Ready to start!\' id=\'InstructButton\'></center>\n</p>\n\n</body>\n</html>'
+put	0	"{u'tag': u'key', u'time': 1424651715473, u'value': u'\\r', u'client': 0}"
+put	0	"{u'time': 1424651715474, u'tag': u'click', u'id': u'InstructButton', u'client': 0}"
+took	0	"{u'client': 0, u'tag': u'click', u'id': u'InstructButton', u'time': 1424651715474}"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="exp.css" />\n</head>\n<body>\n\n<h3>Get ready for the next presentation scene!</h3>\n\n</body>\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\r\n<head>\r\n<link rel="stylesheet" type="text/css" href="exp.css" />\r\n</head>\r\n<body>\r\n\r\n<div>\r\n<img src="http://REDACTED.edu/~REDACTED/MDPictures/READ_6_1.jpg" width=600>\r\n</div>\r\n\r\n<br></br>\r\n\r\n</body>\r\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="exp.css" />\n</head>\n<body>\n\n<h3>In the action scene, Sam reads the book.</h3>\n\n</body>\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\r\n<head>\r\n<link rel="stylesheet" type="text/css" href="exp.css" />\r\n</head>\r\n<body>\r\n\r\n<div>\r\n<img src="http://REDACTED.edu/~REDACTED/MDPictures/READ.jpg" width=600>\r\n</div>\r\n\r\n<h3> Sam reads the book. </h3>\r\n<br></br>\r\n\r\n</body>\r\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+take	0	"{'tag': 'timestamp', 'client': 0}"
+let	0	'(body) ...timestamp...'
+put	0	"{u'tag': u'timestamp', u'time': 1424651742609, u'client': 0}"
+took	0	"{u'tag': u'timestamp', u'client': 0, u'time': 1424651742609}"
+let	0	'(body)'
+take	0	"{'tag': 'click', 'id': 'TrialButton', 'client': 0}"
+add	0	'(body)\n<html>\r\n<head>\r\n<link rel="stylesheet" type="text/css" href="exp.css" />\r\n</head>\r\n<body>\r\n\r\n<div>\r\n<img src="http://REDACTED.edu/~REDACTED/MDPictures/READ_6_1.jpg" width=600>\r\n</div>\r\n\r\n<h3> What happens in this scene? </h3>\r\n\r\n\r\n<p class="blocktext"><center>\r\n<input type=\'text\' id="Word1">\r\n<input type=\'text\' id="Word2">\r\n</center></p>\r\n\r\n<p class="blocktext"><center>\r\n<input type=\'submit\' value=\'Done\' id=\'TrialButton\'>\r\n</center></p>\r\n\r\n</body>\r\n</html>'
+put	0	"{u'time': 1424651998124, u'tag': u'click', u'id': u'TrialButton', u'client': 0}"
+took	0	"{u'client': 0, u'tag': u'click', u'id': u'TrialButton', u'time': 1424651998124}"
+take	0	"{'ticket': 1, 'tag': 'peek'}"
+peek	0	'(#Word1)'
+put	0	"{u'ticket': 1, u'tag': u'peek', u'time': 1424651998132, u'value': u'asdf', u'client': 0}"
+took	0	"{u'ticket': 1, u'tag': u'peek', u'client': 0, u'value': u'asdf', u'time': 1424651998132}"
+take	0	"{'ticket': 2, 'tag': 'peek'}"
+peek	0	'(#Word2)'
+put	0	"{u'ticket': 2, u'tag': u'peek', u'time': 1424651998148, u'value': u'asdf', u'client': 0}"
+took	0	"{u'ticket': 2, u'tag': u'peek', u'client': 0, u'value': u'asdf', u'time': 1424651998148}"
+take	0	"{'tag': 'timestamp', 'client': 0}"
+let	0	'(body) ...timestamp...'
+put	0	"{u'tag': u'timestamp', u'time': 1424651998170, u'client': 0}"
+took	0	"{u'tag': u'timestamp', u'client': 0, u'time': 1424651998170}"
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\r\n<head>\r\n<link rel="stylesheet" type="text/css" href="exp.css" />\r\n</head>\r\n<body>\r\n\r\n<h3>Good job!</h3>\r\n\r\n<p class="blocktext"> It took you 255.561 seconds to come up with that description.  Your average speed is 255.561 seconds per question.</p>\r\n\r\n<br></br>\r\n\r\n<div class="meter-wrap">\r\n    <div class="meter-value" style="background-color: #0a0; width: 8.33333333333%;">\r\n        <div class="meter-text">\r\n            You have finished 1 out of 12 questions!\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n</body>\r\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+log	0	u"('h1f52d6d27a0', 0, '4', 'READ', 'Sam reads the book.', '6_1', 'Get ready for the next presentation scene!', 'http://REDACTED.edu/~REDACTED/MDPictures/READ_6_1.jpg', 'http://REDACTED.edu/~REDACTED/MDPictures/READ.jpg', u'asdf', u'asdf', 'none', 255.561)"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="exp.css" />\n</head>\n<body>\n\n<h3>Get ready for the next presentation scene!</h3>\n\n</body>\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\r\n<head>\r\n<link rel="stylesheet" type="text/css" href="exp.css" />\r\n</head>\r\n<body>\r\n\r\n<div>\r\n<img src="http://REDACTED.edu/~REDACTED/MDPictures/EAT_2_5.jpg" width=600>\r\n</div>\r\n\r\n<br></br>\r\n\r\n</body>\r\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+let	0	'(body)'
+take	0	"{'tag': 'PING', 'client': 0}"
+add	0	'(body)\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="exp.css" />\n</head>\n<body>\n\n<h3>In the action scene, Alexa eats the orange.</h3>\n\n</body>\n</html>'
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+let	0	'(body)'
+add	0	'(body)\n<html>\r\n<head>\r\n<link rel="stylesheet" type="text/css" href="exp.css" />\r\n</head>\r\n<body>\r\n\r\n<div>\r\n<img src="http://REDACTED.edu/~REDACTED/MDPictures/EAT.jpg" width=600>\r\n</div>\r\n\r\n<h3> Alexa eats the orange. </h3>\r\n<br></br>\r\n\r\n</body>\r\n</html>'
+take	0	"{'tag': 'PING', 'client': 0}"
+put	0	"{'tag': 'PING', 'client': 0}"
+took	0	"{'tag': 'PING', 'client': 0}"
+take	0	"{'tag': 'timestamp', 'client': 0}"
+let	0	'(body) ...timestamp...'
+put	0	"{u'tag': u'timestamp', u'time': 1424652029206, u'client': 0}"
+took	0	"{u'tag': u'timestamp', u'client': 0, u'time': 1424652029206}"
+let	0	'(body)'
+take	0	"{'tag': 'click', 'id': 'TrialButton', 'client': 0}"
+add	0	'(body)\n<html>\r\n<head>\r\n<link rel="stylesheet" type="text/css" href="exp.css" />\r\n</head>\r\n<body>\r\n\r\n<div>\r\n<img src="http://REDACTED.edu/~REDACTED/MDPictures/EAT_2_5.jpg" width=600>\r\n</div>\r\n\r\n<h3> What happens in this scene? </h3>\r\n\r\n\r\n<p class="blocktext"><center>\r\n<input type=\'text\' id="Word1">\r\n<input type=\'text\' id="Word2">\r\n</center></p>\r\n\r\n<p class="blocktext"><center>\r\n<input type=\'submit\' value=\'Done\' id=\'TrialButton\'>\r\n</center></p>\r\n\r\n</body>\r\n</html>'
