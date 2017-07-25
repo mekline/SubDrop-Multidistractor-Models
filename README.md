@@ -58,6 +58,10 @@ Two matlab scripts that instantiate the models described in the paper; outputs a
 
 Computes all the correlations and graphs reported in the modeling section of the paper, plus some new exploratory plots of human vs. model predictions by word. This script produces all the jpgs.
 
+* MODEL SUPPLEMENT.docx
+
+Documents two additional models not reported in the main paper, which are versions of the 'succeed or fail' and RSA models that also incorporate the cost of each word type (A, V, P) by estimating these costs from the dataset. 
+
 * CSVs: dummycost, informative_baserate, informative_nobaserate, succeedorfail, etc. 
 
 Outputs of the models, produced by *mainFun.m*
