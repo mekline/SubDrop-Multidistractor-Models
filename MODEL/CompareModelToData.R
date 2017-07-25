@@ -133,6 +133,9 @@ toGraph[toGraph$model == "human",]$modelLabel <- "Human Performance"
 toGraph$modelLabel <- as.factor(toGraph$modelLabel)
 toGraph$modelLabel <- factor(toGraph$modelLabel,levels = c("Cost only","Succeed/Fail", "Succeed/Fail & Cost", "Rational Speaker", "Rational Speaker & Cost", "Human Performance"))       
 
+#Version without cost models for new paper draft
+toGraph2 <- filter(toGraph, model %in% c("dummycost", "succeedorfail_nobase", "informative_nobaserate", "human"))
+toGraph <- toGraph2
 ggplot(data=toGraph, aes(x=Word, y=prob, fill=trialLabel)) + 
   geom_bar(position=position_dodge(), stat="identity") +
   coord_cartesian(ylim=c(0,1)) +
@@ -147,10 +150,10 @@ ggplot(data=toGraph, aes(x=Word, y=prob, fill=trialLabel)) +
   theme(text = element_text(family="Times", size=rel(4))) +
   #theme(legend.text = element_text(family="Times", size=rel(4))) +
   theme(axis.text = element_text(family="Times", size=rel(0.9))) +
-  facet_wrap( ~ modelLabel, ncol=3) +
+  facet_wrap( ~ modelLabel, ncol=2) +
   theme(strip.text = element_text(family="Times", size=rel(0.9))) 
 
-ggsave(filename="allmodels_nolegend.jpg", width=11, height=8)
+ggsave(filename="threemodels_nolegend.jpg", width=11, height=8)
 
 #Why is the correlation between succeedorfail as high as it is? Melissa suspects simpsons paradoxes
 

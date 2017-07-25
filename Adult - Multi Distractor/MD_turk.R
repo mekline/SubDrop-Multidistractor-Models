@@ -2,7 +2,7 @@
 ## Analysis of multi-distractor 'SubDrop' experiment
 ###############################################################
 
-#To run somewhere other than MK's laptop
+#Set your directory, specific to your computer
 #setwd(mydir) <- your directory here
 
 #Necessary packages
@@ -313,33 +313,37 @@ mydata$verb <- as.factor(mydata$verb)
 #To get the second set of analyses reported for human data: taking out the extreme levels of nSubj to see if everything below holds on non-deterministic cases!!!!
 #mydata <- mydata[mydata$nSubj < 6 & mydata$nSubj > 1,]
 
-#From a reviewer suggestion: In our main analysis, we coded nSubj as numeric/interval.
-#Ordinal coding might be more correct, and stats can be examined by uncommenting the line below
-#mydata$nSubj <- ordered(mydata$nSubj)
-
-#In brief, this yields equivalent results for both mentionObject and mentionSubject tests with all 
-#levels, as well as equivalent results for mentionSubject with just intermediate levels (see line 318),
-#but the model for mentionObject fails to converge even with just a single random intercept. In the 
-#interval-coding version, this model is only weakly significantly better than the control model, so we 
-#should moderate our confidence in that conclusion carefully. 
 
 #######
 #We test two (nonindependent) different outcome measures, i.e. whether Subject was mentioned
 
 #The nsubj manipulation is within-subject AND within-item, so the full random slopes model is:
-full_maximal_model <- glmer(mentionSubject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
-#(slow to converge)
+full_maximal_model_subj <- glmer(mentionSubject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+#(slow to converge but should get there)
 
 #Comparison model with just random slopes:
-random_slope_model <- glmer(mentionSubject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+random_slope_model_subj <- glmer(mentionSubject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 
 #Likelihood ratio test:
-anova(full_maximal_model, random_slope_model)
+anova(full_maximal_model_subj, random_slope_model_subj)
 
-#For ordinal factors, it didn't converge.  Dropped verb random slopes first, then subject random slopes
+#Changing how we report this in response to reviewer request, giving beta and se(beta)
+#Note, no change to the model, just how stats reported in the paper
+summary(full_maximal_model_subj)
+
+
+#From a reviewer suggestion: In our main analysis, we coded nSubj as numeric/interval.
+#Ordinal coding might be more correct, and stats can be examined by uncommenting the line below
+#mydata$nSubj <- ordered(mydata$nSubj)
+#In brief, this yields equivalent results for both mentionObject and mentionSubject tests with all 
+#levels, as well as equivalent results for mentionSubject with just intermediate levels (see line 318),
+#but the model for mentionObject with just intermediate levels fails to converge even with 
+#just a single random intercept. In the interval-coding version, this model is only weakly 
+#significantly better than the control model, should moderate our confidence in that conclusion carefully. 
+
+#Subjects with ordinal factors: it didn't converge.  Dropped verb random slopes first, then subject random slopes
 #notfull_maximal_model <- glmer(mentionSubject ~1 nSubj + (1|paycode) +(1|verb), data=mydata, family="binomial")
 #notfullrandom_slope_model <- glmer(mentionSubject ~1 + (1|paycode) +(1|verb), data=mydata, family="binomial")
-
 #Likelihood ratio test (ordinal factors)
 #anova(notfull_maximal_model, notfullrandom_slope_model)
 
@@ -347,10 +351,15 @@ anova(full_maximal_model, random_slope_model)
 #...Or ask whether object was mentioned
 
 #Use with numeric coding
-full_maximal_model <- glmer(mentionObject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+full_maximal_model_obj <- glmer(mentionObject ~ nSubj + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
 
-random_slope_model <- glmer(mentionObject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
-anova(full_maximal_model, random_slope_model)
+random_slope_model_obj <- glmer(mentionObject ~1 + (nSubj|paycode) +(nSubj|verb), data=mydata, family="binomial")
+
+#Likelihood ratio
+anova(full_maximal_model_obj, random_slope_model_obj)
+
+#Summary
+summary(full_maximal_model_obj)
 
 #Use with ordinal coding, full dataset (doesn't converge with slopes) Note, this fails on middle-level data, which fails to converge in all cases
 #notfull_maximal_model <- glmer(mentionObject ~ nSubj + (1|paycode) +(1|verb), data=mydata, family="binomial")
