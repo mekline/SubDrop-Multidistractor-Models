@@ -29,7 +29,7 @@ The main analysis pipeline, which starts from the raw data and produces all anal
 
 * snazzy potato 11-20.txt
 
-IDs of AMT workers who participated in a pilot version of the study and thus shouldn't be included in analysis (we told them not to sign up if they had been in that experiment but some did anyway)
+Workers who participated in a pilot version of the study and thus shouldn't be included in analysis (we told them not to sign up if they had been in that experiment but some did anyway, analysis script uses this to screen participants)
 
 
 #### Presentation Script (formerly MD11-20-12/)
