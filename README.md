@@ -34,7 +34,7 @@ Workers who participated in a pilot version of the study and thus shouldn't be i
 
 #### Presentation Script (formerly MD11-20-12/)
 
-The willow script (randomizes order/condition assignments, displays trials to participants, records responses to our server). It's old code. 
+The willow script (randomizes order/condition assignments, displays trials to participants, records responses to our server). It's old code. (Note, csv/txt outputs in the internal log/ folder in here are from piloting/script creation) 
 
 
 #### Stimuli (formerly Stims for Multi-distractor/)
