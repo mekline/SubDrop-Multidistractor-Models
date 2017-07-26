@@ -150,7 +150,34 @@ ggplot(data=toGraph, aes(x=Word, y=prob, fill=trialLabel)) +
   facet_wrap( ~ modelLabel, ncol=3) +
   theme(strip.text = element_text(family="Times", size=rel(0.9))) 
 
-ggsave(filename="allmodels_nolegend.jpg", width=11, height=8)
+
+#For the paper, just the no-cost models:
+
+toGraph <- filter(toGraph, model %in% c("succeedorfail", "human", "dummycost", "informative_nobaserate"))
+ggplot(data=toGraph, aes(x=Word, y=prob, fill=trialLabel)) + 
+  geom_bar(position=position_dodge(), stat="identity") +
+  coord_cartesian(ylim=c(0,1)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.5))+
+  xlab('') +
+  ylab('p(include word)') +
+  theme(strip.background = element_blank()) +
+  theme_bw() +
+  #theme(legend.key = element_blank()) +
+  theme(legend.position = 'none') +
+  scale_fill_manual(name="", values=my.cols) +
+  theme(text = element_text(family="Times", size=rel(4))) +
+  #theme(legend.text = element_text(family="Times", size=rel(4))) +
+  theme(axis.text = element_text(family="Times", size=rel(0.9))) +
+  facet_wrap( ~ modelLabel, ncol=2) +
+  theme(strip.text = element_text(family="Times", size=rel(0.9))) 
+
+
+ggsave(filename="fourmodels_nolegend_forpaper.jpg", width=7, height=6.5)
+
+
+
+
+
 
 #Why is the correlation between succeedorfail as high as it is? I suspect simpsons paradoxes
 

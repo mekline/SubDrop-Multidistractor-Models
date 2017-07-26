@@ -459,7 +459,7 @@ ggplot(data=mylong, aes(x=condLabel, y=mentionMean, fill=trialLabel)) +
 
 
 
-ggsave(filename="humanPerformance.jpg", width=10, height=6)
+ggsave(filename="humanPerformance.jpg", width=10, height=6, units="in")
 
 
 
